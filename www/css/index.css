@@ -1,0 +1,398 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+@font-face {
+	font-family: gotham;
+	src: url('fonts/gotham_medium.ttf');
+}
+
+@font-face {
+	font-family: gotham-bold;
+	src: url('fonts/gotham_bold.ttf');
+}
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    
+    background: #FF0017 url('../img/fondo.png') no-repeat center middle;
+    background-image: url('../img/fondo.png');
+    background-size: cover;
+	background-attachment: fixed;
+    
+    font-family: gotham, 'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+	
+    color: #FFFFFF;
+    
+    width: 100%;
+    height: 100%;
+    
+    margin: 0px;
+    padding: 0px;
+}
+
+/* Portrait layout (default) */
+.app {
+    background:url(../img/logo.png) no-repeat center top; /* 170px x 200px */
+    position:absolute;             /* position in the center of the screen */
+    left:50%;
+    top:50%;
+    height:50px;                   /* text area height */
+    width:225px;                   /* text area width */
+    text-align:center;
+    padding:180px 0px 0px 0px;     /* image height is 200px (bottom 20px are overlapped with text) */
+    margin:-115px 0px 0px -112px;  /* offset vertical: half of image height and text area height */
+                                   /* offset horizontal: half of text area width */
+}
+
+/* Landscape layout (with min-width) */
+@media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
+    .app {
+        background-position:left center;
+        padding:75px 0px 75px 170px;  /* padding-top + padding-bottom + text area = image height */
+        margin:-90px 0px 0px -198px;  /* offset vertical: half of image height */
+                                      /* offset horizontal: half of image width and text area width */
+    }
+}
+
+h1 {
+    font-size:24px;
+    font-weight:normal;
+    margin:0px;
+    overflow:visible;
+    padding:0px;
+    text-align:center;
+}
+
+.event {
+    border-radius:4px;
+    -webkit-border-radius:4px;
+    color:#FFFFFF;
+    font-size:12px;
+    margin:0px 30px;
+    padding:2px 0px;
+}
+
+.event.listening {
+    background-color:#333333;
+    display:block;
+}
+
+.event.received {
+    background-color:#4B946A;
+    display:none;
+}
+
+@keyframes fade {
+    from { opacity: 1.0; }
+    50% { opacity: 0.4; }
+    to { opacity: 1.0; }
+}
+ 
+@-webkit-keyframes fade {
+    from { opacity: 1.0; }
+    50% { opacity: 0.4; }
+    to { opacity: 1.0; }
+}
+ 
+.blink {
+    animation:fade 3000ms infinite;
+    -webkit-animation:fade 3000ms infinite;
+}
+
+
+/** Login **/
+#loader {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	
+	left: 0;
+	top: 0;
+	
+	background: #FF0017 url('../img/cargando.png') no-repeat center middle;
+	background-image: url('../img/cargando.png');
+    background-size: cover;
+	background-attachment: fixed;
+}
+
+#btn_conectar_fb {
+	display: none;
+	
+	position: absolute;
+	width: 48%;
+	
+	left: 26%;
+	top: 86%;
+}
+
+/** Principal **/
+#content {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	
+	left: 0;
+	top: 0;
+}
+
+.izquierda {
+	position: fixed;
+	width: 25%;
+	height: 100%;
+	
+	left: 0;
+	top: 0;
+	
+	text-align: center;
+}
+
+.derecha {
+	position: fixed;
+	width: 75%;
+	height: 100%;
+	
+	right: 0;
+	top: 0;
+	
+	text-align: center;
+}
+
+#mnu_logo img {
+	width: 98%;
+}
+
+#cuadro_negro {
+	position: absolute;
+	width: 94%;
+	height: 94%;
+	
+	right: 2%;
+	top: 2%;
+	
+	background-image: url('../img/fondo_dashboard.png');
+	border: 0.2em solid #3F4243;
+	
+	-moz-border-radius: 2%;
+	border-radius: 2%;
+	
+	-moz-box-shadow:    0.2em 0.2em 0.6em #000000;
+	-webkit-box-shadow: 0.2em 0.2em 0.6em #000000;
+	box-shadow:         0.2em 0.2em 0.6em #000000;
+	
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	z-index: 1;
+}
+
+.overlay {
+	position: fixed;
+	display: none;
+	background: transparent url('../img/overlay.png') repeat top left;
+	
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+
+	z-index: 1000;
+}
+
+.alerta {
+	position: absolute;
+	
+	width: 70%;
+	left: 15%;
+	
+	height: 40%;
+	top: 25%;
+	
+	font-size: 110%;
+	padding: 1em;
+	
+	background-image: url('../img/fondo_dashboard.png');
+	border: 0.2em solid #3F4243;
+	
+	-moz-border-radius: 5%;
+	border-radius: 5%;
+	
+	-moz-box-shadow:    0.2em 0.2em 0.6em #000000;
+	-webkit-box-shadow: 0.2em 0.2em 0.6em #000000;
+	box-shadow:         0.2em 0.2em 0.6em #000000;
+	
+	text-align: center;
+}
+
+/** DASHBOARD **/
+.partida {
+	position: relative;
+	
+	width: 100%;
+	height: 22%;
+	
+	margin-top: 1.5%;
+	margin-bottom: 1.5%;
+}
+
+.partida .jugador {
+	position: absolute;
+	
+	width: 18.5%;
+	height: 100%;
+	
+	left: 1.5%;
+	
+	background: #FFFFFF;
+	
+	-moz-border-radius: 5%;
+	border-radius: 5%;
+}
+
+.jugador .thumb {
+	position: absolute;
+	
+	width: 68%;
+	
+	top: 10%;
+	left: 16%;
+}
+
+.jugador .nombre {
+	position: absolute;
+	display: block;
+	
+	width: 100%;
+	
+	bottom: 5%;
+	left: 0;
+	
+	font-size: 60%;
+	color: #000000;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.partida .estado {
+	position: absolute;
+	
+	width: 77%;
+	height: 100%;
+	
+	right: 1.5%;
+	
+	text-align: left;
+}
+
+.estado .mensaje {
+	position: absolute;
+	display: block;
+	
+	top: 30%;
+	left: 5%;
+	
+	font-family: gotham-bold;
+	font-size: 110%;
+	text-transform: uppercase;
+}
+
+.estado .actualizacion {
+	position: absolute;
+	display: block;
+	
+	top: 60%;
+	left: 5%;
+	
+	font-family: gotham-bold;
+	font-size: 90%;
+}
+
+.estado .botones {
+	position: absolute;
+	display: none;
+	
+	top: 40%;
+	right: 10%;
+}
+
+.partida .tu_turno {
+	background: transparent url('../img/db_estado_tu_turno.png') no-repeat top left;
+    background-size: cover;
+    
+    -moz-text-shadow:    0.1em 0.1em 0.1em #009D44;
+	-webkit-text-shadow: 0.1em 0.1em 0.1em #009D44;
+	text-shadow:         0.1em 0.1em 0.1em #009D44;
+}
+
+.partida .su_turno {
+	background: transparent url('../img/db_estado_su_turno.png') no-repeat top left;
+    background-size: cover;
+    
+    -moz-text-shadow:    0.1em 0.1em 0.1em #006DB1;
+	-webkit-text-shadow: 0.1em 0.1em 0.1em #006DB1;
+	text-shadow:         0.1em 0.1em 0.1em #006DB1;
+}
+
+.partida .abandono {
+	background: transparent url('../img/db_estado_abandono.png') no-repeat top left;
+    background-size: cover;
+    
+    -moz-text-shadow:    0.1em 0.1em 0.1em #E7AF42;
+	-webkit-text-shadow: 0.1em 0.1em 0.1em #E7AF42;
+	text-shadow:         0.1em 0.1em 0.1em #E7AF42;
+}
+
+/** ADAPTACIONES **/
+/** Multiplicar por 2.4 el original (320) **/
+@media only screen and (max-device-width: 768px) {
+	body {
+		font-size: 33.6px;
+	}
+}
+
+/** Multiplicar por 2 el original (320) **/
+@media only screen and (max-device-width: 640px) {
+	body {
+		font-size: 28px;
+	}
+}
+
+/** Multiplicar por 1.5 el original (320) o por 2 el menor (240) **/
+@media only screen and (max-device-width: 480px) {
+	body {
+		font-size: 21px;
+	}
+}
+
+/** Original (320) **/
+@media only screen and (max-device-width: 320px) {
+	body {
+		font-size: 14px;
+	}
+}
+
+/** Multiplicar por 0.75 del original (320) **/
+@media only screen and (max-device-width: 240px) {
+	body {
+		font-size: 10.5px;
+	}
+}
