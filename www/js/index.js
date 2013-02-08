@@ -52,7 +52,8 @@ var app = {
 var paginaIndex = "index.html";
 var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
-var templateDashboard = "dashboard.html"
+var templateDashboard = "dashboard.html";
+var templateTablero = "juegoNuevoTablero.html";
 
 var appId = "336541486458847";
 var sistemaOperativo = "iOS"; //iOS
@@ -192,10 +193,6 @@ function limitaTexto(cadena, longitud) {
 	return resultado;
 }
 
-function alert(texto) {
-	navigator.notification.alert(texto, null, 'Calchupadora');
-}
-
 function abrirTemplate(template) {
 	$('#content').load(template);
 }
@@ -219,5 +216,118 @@ function removeCache(key) {
 
 function clearCache() {
 	removeCache('usuario');
+	removeCache('amigos');
 	removeCache('partidas');
+}
+
+/** Funciones para Nueva Partida **/
+function updateArrayAmigos(amigosFB) {
+    amigos = new Array();
+                          
+    for (var i=0; i <amigosFB.length; i++) {
+        amigos.push({"nombre":amigosFB[i].name, "ruta": "http://graph.facebook.com/" + amigosFB[i].uid + "/picture?width=250&height=250"});
+    }
+    
+    return amigos;
+}
+
+function obtenPrimerNombre(nombre) {
+	if (nombre.indexOf(' ') > 0) {
+		return nombre.substring(0, nombre.indexOf(' '));
+	}
+	return nombre;
+}
+
+function getGridOponentes() {
+    var html = '';
+    var amigos = getCache('amigos');
+                          
+    for (var i=0; i <amigos.length; i++) {
+        html = html + '<div class="carta cartaTablero" posicion="' + i + '" onclick="seleccionarOponente(' + i + ')"><img class="thumb" src="' + amigos[i].ruta + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(amigos[i].nombre), 10) + '</span></div>';
+    }
+                          
+    return html;
+}
+
+function seleccionarTablero(tipoTablero) {
+    if (!tipoTablero) {
+        tipoTablero = 'personajes';
+    }
+    setCache('tipoTablero', tipoTablero);
+	abrirTemplate(templateTablero);
+}
+
+function crearOponentes(contenedor) {
+	FB.api('fql',
+		{ q : "SELECT uid, name, pic_square FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) ORDER BY name asc"},
+		function(response) {
+			if (response.data !== undefined) {
+				amigos = updateArrayAmigos(response.data);
+                setCache('amigos', amigos);
+                contenedor.html(getGridOponentes());
+			} else {
+				alert("No se pudo obtener la lista de tus amigos. Por favor intenta hacer un evento nuevamente.");
+				inicio();
+			}
+		}
+	);
+}
+
+
+/** ALERTAS **/
+var funciones;
+
+var ALERTA_OK = 'OK';
+var ALERTA_SI_NO = 'SI_NO';
+var ALERTA_NUEVO_JUEGO = 'NUEVO_JUEGO';
+var ALERTA_INPUT = 'INPUT';
+
+function alert(texto, tipo, acciones) {
+	if (texto === undefined) {
+		texto = '';
+	}
+	if (tipo === undefined) {
+		tipo = ALERTA_OK;
+	}
+	if (acciones === undefined) {
+		acciones = new Array();
+	}
+	
+	$('.alerta[tipo="' + tipo + '"]').children('.alerta_mensaje').html(texto);
+	funciones = acciones;
+	
+	$('.alerta[tipo="' + tipo + '"]').show();
+	$('#alertas').fadeIn('fast');
+	
+	// navigator.notification.alert(texto, null, 'AdivinaMe'); // Alert original
+}
+
+function cerrarAlert() {
+	$('#alertas').fadeOut('fast');
+	$('.alerta').hide();
+}
+
+function ejecutaFuncion(nombre) {
+	if (funciones[nombre]) {
+		funciones[nombre]();
+	}
+	cerrarAlert();
+}
+
+
+/** Funciones de sonido **/
+function createAudio(name) {
+    var src;
+    switch(name) {
+        case 'card_flip':
+            src = 'audio/card_flip.wav';
+            break;
+        default:
+            break;         
+    }
+	      
+    // Create Media object from src
+    my_media = new Media(src, function(){}, function(){});
+                          
+    return my_media;        
 }

@@ -35,10 +35,12 @@ body {
     -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
     -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
     
-    background: #FF0017 url('../img/fondo.png') no-repeat center middle;
+    background: #FF0017;
     background-image: url('../img/fondo.png');
-    background-size: cover;
+    background-repeat: no-repeat;
 	background-attachment: fixed;
+	background-position: center center; 
+    background-size: cover;
     
     font-family: gotham, 'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
 	
@@ -49,91 +51,25 @@ body {
     
     margin: 0px;
     padding: 0px;
+    
+    text-align: center;
 }
-
-/* Portrait layout (default) */
-.app {
-    background:url(../img/logo.png) no-repeat center top; /* 170px x 200px */
-    position:absolute;             /* position in the center of the screen */
-    left:50%;
-    top:50%;
-    height:50px;                   /* text area height */
-    width:225px;                   /* text area width */
-    text-align:center;
-    padding:180px 0px 0px 0px;     /* image height is 200px (bottom 20px are overlapped with text) */
-    margin:-115px 0px 0px -112px;  /* offset vertical: half of image height and text area height */
-                                   /* offset horizontal: half of text area width */
-}
-
-/* Landscape layout (with min-width) */
-@media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
-    .app {
-        background-position:left center;
-        padding:75px 0px 75px 170px;  /* padding-top + padding-bottom + text area = image height */
-        margin:-90px 0px 0px -198px;  /* offset vertical: half of image height */
-                                      /* offset horizontal: half of image width and text area width */
-    }
-}
-
-h1 {
-    font-size:24px;
-    font-weight:normal;
-    margin:0px;
-    overflow:visible;
-    padding:0px;
-    text-align:center;
-}
-
-.event {
-    border-radius:4px;
-    -webkit-border-radius:4px;
-    color:#FFFFFF;
-    font-size:12px;
-    margin:0px 30px;
-    padding:2px 0px;
-}
-
-.event.listening {
-    background-color:#333333;
-    display:block;
-}
-
-.event.received {
-    background-color:#4B946A;
-    display:none;
-}
-
-@keyframes fade {
-    from { opacity: 1.0; }
-    50% { opacity: 0.4; }
-    to { opacity: 1.0; }
-}
- 
-@-webkit-keyframes fade {
-    from { opacity: 1.0; }
-    50% { opacity: 0.4; }
-    to { opacity: 1.0; }
-}
- 
-.blink {
-    animation:fade 3000ms infinite;
-    -webkit-animation:fade 3000ms infinite;
-}
-
 
 /** Login **/
 #loader {
 	position: fixed;
-	width: 100%;
-	height: 100%;
 	
-	left: 0;
-	top: 0;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
 	
-	background: #FF0017 url('../img/cargando.png') no-repeat center middle;
+	background: #FF0017;
 	background-image: url('../img/cargando.png');
-    background-size: cover;
+	background-repeat: no-repeat;
 	background-attachment: fixed;
+	background-position: center center; 
+    background-size: cover;
 }
 
 #btn_conectar_fb {
@@ -149,16 +85,14 @@ h1 {
 /** Principal **/
 #content {
 	position: fixed;
-	width: 100%;
-	height: 100%;
 	
-	left: 0;
-	top: 0;
+	left: 50%;
+	top: 50%;
 }
 
 .izquierda {
-	position: fixed;
-	width: 25%;
+	position: absolute;
+	width: 22.40%;
 	height: 100%;
 	
 	left: 0;
@@ -168,8 +102,8 @@ h1 {
 }
 
 .derecha {
-	position: fixed;
-	width: 75%;
+	position: absolute;
+	width: 77.60%;
 	height: 100%;
 	
 	right: 0;
@@ -178,16 +112,25 @@ h1 {
 	text-align: center;
 }
 
+#menu {
+	position: absolute;
+	
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+}
+
 #mnu_logo img {
 	width: 98%;
 }
 
 #cuadro_negro {
 	position: absolute;
-	width: 94%;
+	width: 96%;
 	height: 94%;
 	
-	right: 2%;
+	left: 0;
 	top: 2%;
 	
 	background-image: url('../img/fondo_dashboard.png');
@@ -219,13 +162,14 @@ h1 {
 }
 
 .alerta {
+	display: none;
 	position: absolute;
 	
 	width: 70%;
-	left: 15%;
+	height: 50%;
 	
-	height: 40%;
-	top: 25%;
+	left: 15%;
+	top: 20%;
 	
 	font-size: 110%;
 	padding: 1em;
@@ -243,7 +187,108 @@ h1 {
 	text-align: center;
 }
 
+.alerta .alerta_mensaje {
+	margin-top: 10%;
+	font-size: 120%;
+}
+
+.alerta .alerta_input {
+}
+
+.alerta .alerta_botones {
+	width: 90%;
+	margin-top: 5%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.alerta .alerta_botones img {
+	height: 20%;
+	
+	margin-left: 2%;
+	margin-right: 2%;
+}
+
+.carta {
+	position: relative;
+	
+	background: #FFFFFF;
+	
+	-moz-border-radius: 5%;
+	border-radius: 5%;
+	
+	z-index: 10;
+}
+
+.carta .thumb {
+	position: absolute;
+	
+	width: 74%;
+	
+	top: 10%;
+	left: 13%;
+}
+
+.carta .nombre {
+	position: absolute;
+	display: block;
+	
+	width: 100%;
+	
+	bottom: 5%;
+	left: 0;
+	
+	font-size: 52%;
+	color: #000000;
+	text-transform: uppercase;
+	text-align: center;
+}
+
 /** DASHBOARD **/
+#mnu_monedas {
+	position: absolute;
+	
+	width: 100%;
+	top: 30%;
+	
+	font-family: gotham-bold;
+}
+
+#mnu_monedas #fondo_monedas {
+	position: absolute;
+	
+	width: 80%;
+	
+	right: 10%;
+	top: 0;
+}
+
+#mnu_monedas #total_monedas {
+	position: absolute;
+	
+	width: 100%;
+	
+	right: 0;
+	top: 1.5em;
+	
+	text-align: center;
+}
+
+#mnu_botones {
+	position: absolute;
+	
+	width: 100%;
+	bottom: 1%;
+}
+
+#mnu_botones img {
+	width: 75%;
+}
+
+.mnu_botones_small img {
+	width: 65% !important;
+}
+
 .partida {
 	position: relative;
 	
@@ -261,44 +306,15 @@ h1 {
 	height: 100%;
 	
 	left: 1.5%;
-	
-	background: #FFFFFF;
-	
-	-moz-border-radius: 5%;
-	border-radius: 5%;
-}
-
-.jugador .thumb {
-	position: absolute;
-	
-	width: 68%;
-	
-	top: 10%;
-	left: 16%;
-}
-
-.jugador .nombre {
-	position: absolute;
-	display: block;
-	
-	width: 100%;
-	
-	bottom: 5%;
-	left: 0;
-	
-	font-size: 60%;
-	color: #000000;
-	text-transform: uppercase;
-	text-align: center;
 }
 
 .partida .estado {
 	position: absolute;
 	
-	width: 77%;
+	width: 79%;
 	height: 100%;
 	
-	right: 1.5%;
+	right: 0.5%;
 	
 	text-align: left;
 }
@@ -361,38 +377,238 @@ h1 {
 	text-shadow:         0.1em 0.1em 0.1em #E7AF42;
 }
 
+/** NUEVA PARTIDA **/
+.cartaTablero {
+	position: relative;
+	
+	margin-top: 1%;
+	margin-bottom: 1%;
+    margin-left: 1.5%;
+	
+	width: 18.5%;
+	height: 23%;
+    
+    float: left;
+}
+
+/** SELECCION TABLERO **/
+#mnu_carta .instruccion {
+	height: 20%;
+    
+    left: 20%;
+	top: 30%;
+}
+
+#mnu_carta[class="marco_carta"] {
+	position: relative;
+	
+	width: 68%;
+	height: 22%;
+	
+	left: 16%;
+	
+	background-image: url('../img/fondo_dashboard.png');
+	border: 0.2em solid #3F4243;
+	
+	-moz-border-radius: 12%;
+	border-radius: 12%;
+	
+	-moz-box-shadow:    0.2em 0.2em 0.6em #000000;
+	-webkit-box-shadow: 0.2em 0.2em 0.6em #000000;
+	box-shadow:         0.2em 0.2em 0.6em #000000;
+	
+	z-index: 1;
+}
+
+.marco_carta .carta {
+	position: relative;
+	
+	width: 90%;
+	height: 90%;
+	
+	left: 6%;
+	top: 6%;
+}
+
+/** FLIP CARDS **/
+.panel {
+	float: left;
+	width: 18.3%;
+	height: 23.00%;
+	
+	margin-top: 1%;
+	margin-bottom: 1%;
+	margin-left: 1.5%;
+
+	position: relative;
+	
+	-webkit-perspective: 600px;
+	-moz-perspective: 600px;
+	
+	-moz-border-radius: 2%;
+	border-radius: 2%;
+}
+
+.panel .front {
+	float: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 900;
+	background: #FFFFFF;
+	
+	-moz-box-shadow: 0 1px 5px rgba(0,0,0,0.9);
+	-webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.9);
+	box-shadow: 0 1px 5px rgba(0,0,0,0.9);
+	
+	-webkit-transform: rotateX(0deg) rotateY(0deg);
+	-webkit-transform-style: preserve-3d;
+	-webkit-backface-visibility: hidden;
+	
+	-moz-transform: rotateX(0deg) rotateY(0deg);
+	-moz-transform-style: preserve-3d;
+	-moz-backface-visibility: hidden;
+	
+	/* -- transition is the magic sauce for animation -- */
+	-o-transition: all .4s ease-in-out;
+	-ms-transition: all .4s ease-in-out;
+	-moz-transition: all .4s ease-in-out;
+	-webkit-transition: all .4s ease-in-out;
+	transition: all .4s ease-in-out;
+}
+.panel.flip .front {
+	z-index: 900;
+	border-color: #eee;
+	background: #333;
+	
+	-webkit-transform: rotateY(180deg);
+	-moz-transform: rotateY(180deg);
+	
+	-moz-box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+	box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+}
+
+.panel .back {
+	float: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 800;
+	border: 1px solid #ccc;
+	background: #333;
+	text-shadow: 1px  1px 1px rgba(0,0,0,0.6);
+	
+	-webkit-transform: rotateY(-180deg);
+	-webkit-transform-style: preserve-3d;
+	-webkit-backface-visibility: hidden;
+	
+	-moz-transform: rotateY(-180deg);
+	-moz-transform-style: preserve-3d;
+	-moz-backface-visibility: hidden;
+	
+	/* -- transition is the magic sauce for animation -- */
+	-o-transition: all .4s ease-in-out;
+	-ms-transition: all .4s ease-in-out;
+	-moz-transition: all .4s ease-in-out;
+	-webkit-transition: all .4s ease-in-out;
+	transition: all .4s ease-in-out;
+}
+
+.panel.flip .back {
+	z-index: 1000;
+	background: #80868d;
+	
+	-webkit-transform: rotateX(0deg) rotateY(0deg);
+	-moz-transform: rotateX(0deg) rotateY(0deg);
+	
+	box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+	-moz-box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+}
+
+.click .front {
+	-webkit-transform: rotateY(0deg);
+	-moz-transform: rotateY(0deg);
+}
+.click.flip .front {
+	-webkit-transform: rotateY(180deg);
+	-moz-transform: rotateY(180deg);
+}
+.click .back {
+	-webkit-transform: rotateY(-180deg);
+	-moz-transform: rotateY(-180deg);
+}
+.click.flip .back {
+	-webkit-transform: rotateY(0deg);
+	-moz-transform: rotateY(0deg);
+}
+
+.imagenCarta {
+    height: 80%;
+}
+
+.imagenCartaBack {
+    height: 80%;
+}
+
 /** ADAPTACIONES **/
-/** Multiplicar por 2.4 el original (320) **/
-@media only screen and (max-device-width: 768px) {
-	body {
-		font-size: 33.6px;
-	}
-}
-
-/** Multiplicar por 2 el original (320) **/
-@media only screen and (max-device-width: 640px) {
-	body {
-		font-size: 28px;
-	}
-}
-
-/** Multiplicar por 1.5 el original (320) o por 2 el menor (240) **/
-@media only screen and (max-device-width: 480px) {
-	body {
-		font-size: 21px;
-	}
-}
-
-/** Original (320) **/
-@media only screen and (max-device-width: 320px) {
+/** Original (480 de ancho) **/
+@media only screen and (orientation: landscape) and (min-width: 479px) {
 	body {
 		font-size: 14px;
 	}
+	
+	#content {
+		width: 480px;
+		height: 320px;
+		
+		margin-left: -240px;
+		margin-top: -160px;
+	}
 }
 
-/** Multiplicar por 0.75 del original (320) **/
-@media only screen and (max-device-width: 240px) {
+/** (640 de ancho) Multiplicar 1.33333 (640/480) por original (480) **/
+@media only screen and (orientation: landscape) and (min-width: 639px) {
 	body {
-		font-size: 10.5px;
+		font-size: 18.6666px;
+	}
+	
+	#content {
+		width: 640px;
+		height: 427px;
+		
+		margin-left: -320px;
+		margin-top: -214px;
+	}
+}
+
+/** (800 de ancho) Multiplicar 1.5 (720/480) por original (480) **/
+@media only screen and (orientation: landscape) and (min-width: 719px) {
+	body {
+		font-size: 21px;
+	}
+	
+	#content {
+		width: 720px;
+		height: 480px;
+		
+		margin-left: -360px;
+		margin-top: -240px;
+	}
+}
+
+/** (960 de ancho) Multiplicar 2 (960/480) por original (480) **/
+@media only screen and (orientation: landscape) and (min-width: 959px) {
+	body {
+		font-size: 28px;
+	}
+	
+	#content {
+		width: 960px;
+		height: 640px;
+		
+		margin-left: -480px;
+		margin-top: -320px;
 	}
 }

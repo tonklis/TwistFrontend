@@ -6,27 +6,40 @@
 	});
 	
 	function confirmacion(partida) {
-		$('#borrar').fadeIn('fast');
+		alert('¿Deseas borrar esta partida? Se perderan todos los datos.',
+			 ALERTA_SI_NO,
+			 {
+			 	'btn_no' : cancela,
+			 	'btn_si' : confirma
+			 });
 	}
 	
-	function cerrarConfirmacion() {
-		$('#borrar').fadeOut('fast');
+	function cancela() {
+		navigator.notification.alert('CANCELA', null, 'AdivinaMe'); // Alert original
+	}
+	
+	function confirma() {
+		navigator.notification.alert('Aquí se borraría', null, 'AdivinaMe'); // Alert original
 	}
 </script>
 <div id="dashboard">
 	<div class="izquierda">
 		<div id="menu">
 			<div id="mnu_logo"><img src="img/logo.png"/></div>
-			<div id="mnu_monedas">Monedas: 666</div>
+			<div id="mnu_monedas">
+				<img id="fondo_monedas" src="img/db_monedas.png" />
+				<div id="total_monedas">1000000</div>
+			</div>
 			<div id="mnu_botones">
-				<span onclick="abrirTemplate('nuevaPartida.html');">Crear partida</span>
+				<img id="btn_nuevo_juego" src="img/db_btn_nuevo_juego.png" onclick="abrirTemplate('juegoNuevo.html');" />
+				<img id="btn_ajustes" src="img/db_btn_ajustes.png" onclick="abrirTemplate('ajustes.html');" />
 			</div>
 		</div>
 	</div>
 	<div class="derecha">
 		<div id="cuadro_negro">
-			<div class="partida">
-				<div class="jugador">
+			<div class="partida" onclick="abrirTemplate('juego.html');">
+				<div class="carta jugador">
 					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
 					<span class="nombre">JugadorA</span>
 				</div>
@@ -40,7 +53,7 @@
 				Algo
 			</div>
 			<div class="partida">
-				<div class="jugador">
+				<div class="carta jugador">
 					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
 					<span class="nombre">JugadorB</span>
 				</div>
@@ -51,7 +64,7 @@
 				</div>
 			</div>
 			<div class="partida">
-				<div class="jugador">
+				<div class="carta jugador">
 					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
 					<span class="nombre">JugadorC</span>
 				</div>
@@ -62,7 +75,7 @@
 				</div>
 			</div>
 			<div class="partida">
-				<div class="jugador">
+				<div class="carta jugador">
 					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
 					<span class="nombre">JugadorD</span>
 				</div>
@@ -73,7 +86,7 @@
 				</div>
 			</div>
 			<div class="partida">
-				<div class="jugador">
+				<div class="carta jugador">
 					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
 					<span class="nombre">JugadorE</span>
 				</div>
@@ -83,15 +96,6 @@
 					<div class="botones" onclick="confirmacion(5)">Borrar</div>
 				</div>
 			</div>
-		</div>
-	</div>
-</div>
-<div id="borrar" class="overlay">
-	<div class="alerta">
-		<div class="alerta_mensaje">¿Deseas borrar esta partida? Se perderan todos los datos.</div>
-		<div class="alerta_botones">
-			<div class="btn_si">Sí</div>
-			<div class="btn_no" onclick="cerrarConfirmacion()">No</div>
 		</div>
 	</div>
 </div>
