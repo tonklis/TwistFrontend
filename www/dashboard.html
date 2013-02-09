@@ -6,7 +6,7 @@
 	});
 	
 	function confirmacion(partida) {
-		alert('¿Deseas borrar esta partida? Se perderan todos los datos.',
+		alert('¿Deseas abandonar esta partida? Se perderan todos los datos.',
 			 ALERTA_SI_NO,
 			 {
 			 	'btn_no' : cancela,
@@ -15,17 +15,16 @@
 	}
 	
 	function cancela() {
-		navigator.notification.alert('CANCELA', null, 'AdivinaMe'); // Alert original
+
 	}
 	
 	function confirma() {
-		navigator.notification.alert('Aquí se borraría', null, 'AdivinaMe'); // Alert original
+
 	}
 </script>
 <div id="dashboard">
 	<div class="izquierda">
 		<div id="menu">
-			<div id="mnu_logo"><img src="img/logo.png"/></div>
 			<div id="mnu_monedas">
 				<img id="fondo_monedas" src="img/db_monedas.png" />
 				<div id="total_monedas">1000000</div>

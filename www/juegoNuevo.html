@@ -1,0 +1,44 @@
+<script>
+	// Javascript que se ejecute al iniciar la página.
+    mostrandoSC = false;
+    var posicionSeleccionada = null;
+    
+    crearOponentes($('#cuadro_negro'));
+    
+    function seleccionarOponente(posicion) {
+        if (posicionSeleccionada != null) {
+        	$('.cartaTablero[posicion="' + posicionSeleccionada + '"]').removeClass('cartaSeleccionada');
+        }
+        $('.cartaTablero[posicion="' + posicion + '"]').addClass('cartaSeleccionada');
+        
+        posicionSeleccionada = posicion;
+        
+        $('#mnu_carta').addClass('marco_carta');
+        $('#mnu_carta').html('<div id="carta_seleccionada" class="carta"></div>');
+        $('#carta_seleccionada').html($('.cartaTablero[posicion="' + posicion + '"]').html());
+    }
+    
+    function continuar() {
+        if (posicionSeleccionada != null) {
+        	setCache('nuevo_oponente', $('.carta[posicion="' + posicionSeleccionada + '"]').attr('id'));
+            seleccionarTablero();
+        } else {
+            alert('Debes seleccionar tu oponente para continuar.');
+        }
+    }
+</script>
+<div id="nuevaPartida">
+	<div class="izquierda">
+		<div id="menu">
+			<div id="mnu_carta"><img class="instruccion" src="img/nu_selecciona_oponente.png"/></div>
+			<div id="mnu_botones">
+				<img id="btn_continuar" src="img/btn_continuar.png" onclick="continuar()" />
+                <img id="btn_salir" src="img/btn_salir.png" onclick="inicio()" />
+			</div>
+		</div>
+	</div>
+	<div class="derecha">
+		<div id="cuadro_negro">
+		</div>
+	</div>
+</div>

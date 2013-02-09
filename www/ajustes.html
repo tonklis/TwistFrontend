@@ -1,0 +1,47 @@
+<script>
+	// Javascript que se ejecute al iniciar la página.
+	function actualizarAjuste(evento) {
+		setCache(evento.target.id, (evento.target.value == 'on'));
+	}
+	
+	$('select').each(function() {
+		this.value = getCache(this.id) ? 'on' : 'off';
+	})
+</script>
+<div id="dashboard">
+	<div class="izquierda">
+		<div id="menu">
+			<div id="mnu_botones">
+				<img id="btn_salir" src="img/btn_salir.png" onclick="inicio()" />
+			</div>
+		</div>
+	</div>
+	<div class="derecha">
+		<div id="cuadro_negro" class="forma">
+			<div class="forma_renglon">
+				<label for="aj_notificacion">Avisos:</label>
+				<select name="aj_notificacion" id="aj_notificacion" data-role="slider" onchange="actualizarAjuste(event);">
+					<option value="on">Sí</option>
+					<option value="off">No</option>
+				</select>
+			</div>
+			<div class="forma_renglon">
+				<label for="aj_post">Post en Facebook:</label>
+				<select name="aj_post" id="aj_post" data-role="slider" onchange="actualizarAjuste(event);">
+					<option value="on">Sí</option>
+					<option value="off">No</option>
+				</select>
+			</div>
+			<div class="forma_renglon">
+				<label for="aj_sonido">Sonido:</label>
+				<select name="aj_sonido" id="aj_sonido" data-role="slider" onchange="actualizarAjuste(event);">
+					<option value="on">Sí</option>
+					<option value="off">No</option>
+				</select>
+			</div>
+			<div class="forma_renglon">
+			
+			</div>
+		</div>
+	</div>
+</div>

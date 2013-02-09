@@ -1,0 +1,154 @@
+<script>
+    var posicionSeleccionada = null;
+	
+    // Primero se obtiene la lista de amigos, personajes y famosos si no se tiene en cache. Si ya existe en cache se recupera de la misma
+    var personajes = new Array();
+    
+    for (var i=0; i < 4; i++) {
+		var objeto = {};
+		objeto.id = '' + (i * 6);
+		objeto.nombre = "Lentes";
+		objeto.ruta = "img/personajes/lentes.png";
+		personajes.push(objeto);
+		var objeto = {};
+		objeto.id = '' + (i * 6) + 1;
+		objeto.nombre = "Seniora";
+		objeto.ruta = "img/personajes/seniora.png";
+		personajes.push(objeto);
+		var objeto = {};
+		objeto.id = '' + (i * 6) + 2;
+		objeto.nombre = "David";
+		objeto.ruta = "img/personajes/david.png";
+		personajes.push(objeto);
+		var objeto = {};
+		objeto.id = '' + (i * 6) + 3;
+		objeto.nombre = "Jake";
+		objeto.ruta = "img/personajes/jake.png";
+		personajes.push(objeto);
+		var objeto = {};
+		objeto.id = '' + (i * 6) + 4;
+		objeto.nombre = "Cesar";
+		objeto.ruta = "img/personajes/cesar.png";
+		personajes.push(objeto);
+		var objeto = {};
+		objeto.id = '' + (i * 6) + 5;
+		objeto.nombre = "Jimena";
+		objeto.ruta = "img/personajes/jimena.png";
+		personajes.push(objeto);
+    }
+        
+    var famosos = new Array();
+    var amigos = getCache('amigos');
+    
+    // Obtenemos el tipo de tablero que se debe generar
+    var tipoTablero = getCache('tipoTablero');
+
+    // Generamos el tablero con cartas aleatorias
+    var tablero = generarTablero(tipoTablero);
+    
+    // Desplegamos el tablero generado
+    muestraTablero(tablero);
+    
+    function muestraTablero(tablero) {
+        var cuadro_negro = '';
+        
+        for (var i = 0; i < 20; i++) {
+        	cuadro_negro += obtieneCarta(tablero[i], i, 'seleccionarPersonaje(' + i + ')');
+            // cuadro_negro = cuadro_negro + '<div id="' + tablero[i].id + '" class="carta cartaTablero" posicion="' + i + '" onclick="seleccionarPersonaje(' + i + ')"><img id="thumb_loading_' + i + '" class="thumb_loading" src="img/loading.gif" /><img id="thumb_' + i + '" id_loader="thumb_loading_' + i + '" class="thumb" src="' + tablero[i].ruta + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(tablero[i].nombre), 10) + '</span></div>';
+        }
+        
+        $('#cuadro_negro').html(cuadro_negro);
+        loaderCartas();
+    }
+    
+    function generarTablero(tipoTablero) {
+        // Arreglo que contiene las 20 cartas que conformarán el tablero
+        var tablero = new Array();
+        
+        switch(tipoTablero) {
+            case 'personajes':
+            	cartas = personajes;
+            	break;
+            case 'famosos':
+            	cartas = famosos;
+            	break;
+            case 'amigos':
+            	cartas = amigos;
+            	break;
+            default:
+            	break;
+        }
+        
+        cartas.sort( function() { return 0.5 - Math.random() } );
+        
+        for (var i=0; i <20; i++) {
+            tablero.push(cartas[i]);
+        }
+        
+        return tablero;
+    }
+    
+    function seleccionarPersonaje(posicion) {
+        if (posicionSeleccionada != null) {
+        	$('.cartaTablero[posicion="' + posicionSeleccionada + '"]').removeClass('cartaSeleccionada');
+        }
+        $('.cartaTablero[posicion="' + posicion + '"]').addClass('cartaSeleccionada');
+        
+        posicionSeleccionada = posicion;
+        
+        $('#mnu_carta').addClass('marco_carta');
+        $('#mnu_carta').html('<div id="carta_seleccionada" class="carta"></div>');
+        $('#carta_seleccionada').html($('.cartaTablero[posicion="' + posicion + '"]').html());
+    }
+    
+    function crearPartida() {
+        // Aquí va la lógica que crea la partida en el backend
+        if (posicionSeleccionada != null) {
+        	alert('Tu partida ha sido creada y se ha enviado la solicitud a tu oponente.');
+            inicio();
+        } else {
+            alert('Debes seleccionar tu carta para continuar.');
+        }
+    }
+    
+    function crearXML() {
+    	var jugador1 = getCache('usuario').id;
+    	var jugador2 = getCache('nuevo_oponente');
+    	var tipo = getCache('tipoTablero');
+    	
+    	var xml = '<XMLDocument />';
+    	xml += '<partida id="N" jugador1="' + jugador1 + '" jugador2="' + jugador2 + '" turno="' + jugador2 + '">	';
+    	xml += '<tablero tipo="' + tipo + '">';
+    	$('#cuadro_negro .carta').each(
+    		function() {
+    			xml += '<carta posicion="' + $(this).attr('posicion') + '" id="' + $(this).attr('id') + '" ruta="' + $(this).find('img.thumb').attr('src') + '" nombre="' + $(this).find('span.nombre').html() + '">';
+    			xml += '<estatusJugador1>abierto</estatusJugador1><estatusJugador2>abierto</estatusJugador2>';
+    			xml += '</carta>';
+    		}
+    	);
+    	xml += '</tablero>';
+    	xml += '</partida>';
+    	
+    	return xml;
+    }
+</script>
+<div id="seleccionTablero">
+	<div class="izquierda">
+		<div id="menu">
+            <div id="mnu_carta"><img class="instruccion" src="img/nu_selecciona_persona.png"/></div>
+            <div id="mnu_botones">
+            	<div class="mnu_botones_small">
+					<img id="btn_tablero_personajes" src="img/nu_btn_personajes.png" onclick="seleccionarTablero('personajes');" />
+    	            <img id="btn_tablero_amigos" src="img/nu_btn_amigos.png" onclick="seleccionarTablero('amigos');" />
+	                <img id="btn_tablero_famosos" src="img/nu_btn_famosos.png" onclick="seleccionarTablero('famosos');" />
+                </div>
+                <img id="btn_tablero_continuar" src="img/btn_continuar.png" onclick="crearPartida();" />
+                <img id="btn_tablero_salir" src="img/btn_salir.png" onclick="inicio();" />
+			</div>
+		</div>
+	</div>
+	<div class="derecha">
+		<div id="cuadro_negro">
+		</div>
+	</div>
+</div>

@@ -70,6 +70,8 @@ body {
 	background-attachment: fixed;
 	background-position: center center; 
     background-size: cover;
+    
+    z-index: 1000;
 }
 
 #btn_conectar_fb {
@@ -121,8 +123,19 @@ body {
 	bottom: 0;
 }
 
-#mnu_logo img {
-	width: 98%;
+#logo {
+	position: absolute;
+	
+	width: 22%;
+	
+	left: 0.2%;
+	top: 0;
+	
+	z-index: 1000;
+}
+
+#logo img {
+	width: 100%;
 }
 
 #cuadro_negro {
@@ -168,17 +181,18 @@ body {
 	width: 70%;
 	height: 50%;
 	
-	left: 15%;
+	left: 10%;
 	top: 20%;
 	
 	font-size: 110%;
-	padding: 1em;
+	line-height: 150%;
+	padding: 5%;
 	
 	background-image: url('../img/fondo_dashboard.png');
 	border: 0.2em solid #3F4243;
 	
-	-moz-border-radius: 5%;
-	border-radius: 5%;
+	-moz-border-radius: 3%;
+	border-radius: 3%;
 	
 	-moz-box-shadow:    0.2em 0.2em 0.6em #000000;
 	-webkit-box-shadow: 0.2em 0.2em 0.6em #000000;
@@ -220,6 +234,16 @@ body {
 	z-index: 10;
 }
 
+.carta .thumb_loading {
+	position: absolute;
+	
+	width: 74%;
+	
+	top: 10%;
+	left: 13%;
+	
+	z-index: 20;
+}
 .carta .thumb {
 	position: absolute;
 	
@@ -227,6 +251,8 @@ body {
 	
 	top: 10%;
 	left: 13%;
+	
+	z-index: 15;
 }
 
 .carta .nombre {
@@ -242,6 +268,41 @@ body {
 	color: #000000;
 	text-transform: uppercase;
 	text-align: center;
+}
+
+.carta .letra {
+	position: absolute;
+	display: block;
+	
+	width: 100%;
+	
+	bottom: 15%;
+	left: 0;
+	
+	font-size: 300%;
+	font-family: gotham-bold;
+	color: #000000;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.carta .front {
+
+}
+
+.carta .back {
+	display: none;
+}
+
+.carta .back img {
+	position: absolute;
+	
+	width: 74%;
+	
+	top: 10%;
+	left: 13%;
+	
+	z-index: 15;
 }
 
 /** DASHBOARD **/
@@ -392,6 +453,13 @@ body {
 }
 
 /** SELECCION TABLERO **/
+#mnu_carta {
+	position: absolute;
+	
+	width: 100%;
+	top: 20%;
+}
+
 #mnu_carta .instruccion {
 	height: 20%;
     
@@ -400,12 +468,13 @@ body {
 }
 
 #mnu_carta[class="marco_carta"] {
-	position: relative;
+	position: absolute;
 	
 	width: 68%;
 	height: 22%;
 	
 	left: 16%;
+	top: 20%;
 	
 	background-image: url('../img/fondo_dashboard.png');
 	border: 0.2em solid #3F4243;
@@ -432,30 +501,21 @@ body {
 
 /** FLIP CARDS **/
 .panel {
-	float: left;
-	width: 18.3%;
-	height: 23.00%;
-	
-	margin-top: 1%;
-	margin-bottom: 1%;
-	margin-left: 1.5%;
-
-	position: relative;
-	
-	-webkit-perspective: 600px;
-	-moz-perspective: 600px;
-	
-	-moz-border-radius: 2%;
-	border-radius: 2%;
+	background: transparent !important;
 }
 
 .panel .front {
-	float: none;
 	position: absolute;
 	top: 0;
 	left: 0;
+	right: 0;
+	bottom: 0;
 	z-index: 900;
+	
 	background: #FFFFFF;
+	
+	-moz-border-radius: 5%;
+	border-radius: 5%;
 	
 	-moz-box-shadow: 0 1px 5px rgba(0,0,0,0.9);
 	-webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.9);
@@ -490,14 +550,21 @@ body {
 }
 
 .panel .back {
-	float: none;
+	display: block;
 	position: absolute;
+	
 	top: 0;
 	left: 0;
+	bottom: 0;
+	right: 0;
 	z-index: 800;
+	
 	border: 1px solid #ccc;
 	background: #333;
 	text-shadow: 1px  1px 1px rgba(0,0,0,0.6);
+	
+	-moz-border-radius: 5%;
+	border-radius: 5%;
 	
 	-webkit-transform: rotateY(-180deg);
 	-webkit-transform-style: preserve-3d;
@@ -542,14 +609,6 @@ body {
 .click.flip .back {
 	-webkit-transform: rotateY(0deg);
 	-moz-transform: rotateY(0deg);
-}
-
-.imagenCarta {
-    height: 80%;
-}
-
-.imagenCartaBack {
-    height: 80%;
 }
 
 /** ADAPTACIONES **/

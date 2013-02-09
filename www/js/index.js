@@ -194,7 +194,7 @@ function limitaTexto(cadena, longitud) {
 }
 
 function abrirTemplate(template) {
-	$('#content').load(template);
+	$('#content_load').load(template).hide().fadeIn('slow');
 }
 
 /** Funciones para cache **/
@@ -215,9 +215,21 @@ function removeCache(key) {
 }
 
 function clearCache() {
+	if (!isCache('aj_notificacion')) {
+		setCache('aj_notificacion', true);
+	}
+	if (!isCache('aj_post')) {
+		setCache('aj_post', true);
+	}
+	if (!isCache('aj_sonido')) {
+		setCache('aj_sonido', true);
+	}
+
 	removeCache('usuario');
 	removeCache('amigos');
 	removeCache('partidas');
+	
+	removeCache('nuevo_oponente');
 }
 
 /** Funciones para Nueva Partida **/
@@ -225,7 +237,7 @@ function updateArrayAmigos(amigosFB) {
     amigos = new Array();
                           
     for (var i=0; i <amigosFB.length; i++) {
-        amigos.push({"nombre":amigosFB[i].name, "ruta": "http://graph.facebook.com/" + amigosFB[i].uid + "/picture?width=250&height=250"});
+        amigos.push({"id":amigosFB[i].uid, "nombre":amigosFB[i].name, "ruta": "http://graph.facebook.com/" + amigosFB[i].uid + "/picture?width=250&height=250"});
     }
     
     return amigos;
@@ -241,12 +253,51 @@ function obtenPrimerNombre(nombre) {
 function getGridOponentes() {
     var html = '';
     var amigos = getCache('amigos');
-                          
-    for (var i=0; i <amigos.length; i++) {
-        html = html + '<div class="carta cartaTablero" posicion="' + i + '" onclick="seleccionarOponente(' + i + ')"><img class="thumb" src="' + amigos[i].ruta + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(amigos[i].nombre), 10) + '</span></div>';
+    
+    var primeraLetra = '';
+    for (var i = 0; i < amigos.length; i++) {
+    	if (amigos[i].nombre.charAt(0).toUpperCase() != primeraLetra) {
+    		primeraLetra = amigos[i].nombre.charAt(0).toUpperCase();
+    		html += '<div id="letra_' + primeraLetra + '" class="carta cartaTablero cartaShortcut" onclick="mostrarShortcut(\'letra_' + primeraLetra + '\');"><span class="letra">' + primeraLetra + '</span></div>';
+    	}
+        // html += '<div id="' + amigos[i].id + '" class="carta cartaTablero cartaOponente" posicion="' + i + '" onclick="seleccionarOponente(' + i + ')"><img id="thumb_loading_' + i + '" class="thumb_loading" src="img/loading.gif" /><img id="thumb_' + i + '" id_loader="thumb_loading_' + i + '" class="thumb" src="' + amigos[i].ruta + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(amigos[i].nombre), 10) + '</span></div>';
+        html += obtieneCarta(amigos[i], i, 'seleccionarOponente(' + i + ')', 'cartaOponente');
     }
                           
     return html;
+}
+
+function obtieneCarta(elemento, posicion, onclick, clases) {
+	if (onclick === undefined) {
+		onclick = '';
+	}
+	if (clases === undefined) {
+		clases = '';
+	}
+	return '<div id="' + elemento.id + '" class="carta cartaTablero ' + clases + '" posicion="' + posicion + '" onclick="' + onclick + '"><div class="front"><img id="thumb_loading_' + posicion + '" class="thumb_loading" src="img/loading.gif" /><img id="thumb_' + posicion + '" id_loader="thumb_loading_' + posicion + '" class="thumb" src="' + elemento.ruta + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(elemento.nombre), 10) + '</span></div><div class="back"><img src="img/ju_carta_logo.png"/></div></div>';
+}
+
+var mostrandoSC = false;
+function mostrarShortcut(idLetra) {
+	mostrandoSC = !mostrandoSC;
+	if (mostrandoSC) {
+		$('.cartaOponente').hide();
+		$('#' + idLetra).parent().scrollTop(0);
+	} else {
+		$('.cartaOponente').show();
+		recorrerShortcut(idLetra);
+	}
+}
+
+function recorrerShortcut(idLetra) {
+	$('#' + idLetra).parent().scrollTop($('#' + idLetra).position().top);
+}
+
+function loaderCartas() {
+	// Loader mientras cargan las cartas
+	$('.thumb').load(function(event) {
+		$('#' + $(event.target).attr('id_loader')).hide();
+	});
 }
 
 function seleccionarTablero(tipoTablero) {
@@ -265,6 +316,7 @@ function crearOponentes(contenedor) {
 				amigos = updateArrayAmigos(response.data);
                 setCache('amigos', amigos);
                 contenedor.html(getGridOponentes());
+                loaderCartas();
 			} else {
 				alert("No se pudo obtener la lista de tus amigos. Por favor intenta hacer un evento nuevamente.");
 				inicio();
