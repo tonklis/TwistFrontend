@@ -21,6 +21,7 @@
         <script type="text/javascript" src="js/jquery/jquery.mobile-1.2.0.js"></script>
         
         <!-- Librerias proyecto -->
+        <script type="text/javascript" src="js/accesos.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         
         <title>Adivina-Me</title>
@@ -30,6 +31,12 @@
 		
 		<script>
             document.addEventListener("deviceready", clearCache, false);
+            
+            /* Sobrescribimos la función que se invoca antes de los servicios de facebook. */
+            inicializar = function() {
+				clearCache();
+				$('#alertas').load('alertas.html');
+            }
             
             /* Sobrescribimos la función que se invoca al cargar la página. */
 			iniciarProceso = function () {
@@ -44,6 +51,8 @@
 		
 		<div id="loader">
 			<img id="btn_conectar_fb" src="./img/btn_conectar_fb.png" onclick="login()" />
+		</div>
+		<div id="alertas" class="overlay">
 		</div>
 	</body>
 </html>

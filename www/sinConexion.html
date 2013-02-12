@@ -10,41 +10,19 @@
         <link rel="stylesheet" type="text/css" href="css/jquery/jquery.mobile-1.2.0.css" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         
-        <!-- Liberias Cordova y FB -->
+        <!-- Liberias Cordova -->
         <script type="text/javascript" src="cordova-2.3.0.js"></script>
-        <script type="text/javascript" src="cdv-plugin-fb-connect.js"></script>
-        <script type="text/javascript" src="facebook_js_sdk.js"></script>
         
         <!-- Librerias JQUERY -->
         <script type="text/javascript" src="js/jquery/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery/jquery-ui-1.10.0.custom.js"></script>
         <script type="text/javascript" src="js/jquery/jquery.mobile-1.2.0.js"></script>
         
-        <!-- Librerias proyecto -->
-        <script type="text/javascript" src="js/accesos.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-        
-        <title>Adivina-Me</title>
+        <title>Adivina-Me - Sin Conexión</title>
     </head>
 	<body>
-        <div id="fb-root"></div>
-		
-		<script>
-            /* Sobrescribimos la función que se invoca al cargar la página. */
-			iniciarProceso = function () {
-				inicio();
-				$('#alertas').load('alertas.html');
-			}
-        </script>
-		
-		<div id="content">
-			<div id="logo"><img src="img/logo.png"/></div>
-			<div id="content_load">
-				<div id="loader">
-				</div>
-			</div>
-		</div>
-		<div id="alertas" class="overlay">
+		<div id="loader">
+			Necesitas conexión a internet para continuar.
 		</div>
 	</body>
 </html>

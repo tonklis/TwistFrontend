@@ -1,10 +1,73 @@
 <script>
 	// Javascript que se ejecute al iniciar la página.
-	$(".estado").swipeleft(function(event) {
-		$('.botones').hide();
-		$(event.target).children('.botones').show();
-	});
+	var usuario = getCache('usuario');
+	$('#total_monedas').html(usuario.money);
 	
+	obtenerJuegosPorUsuario({ id : usuario.id },
+		function(response, textStatus, jqXHR) {
+			for (var i = 0; i < response.length; i++) {
+				agregarJuego(response[i]);
+			}
+			setCache('partidas', response);
+		},
+		function(jqXHR, textStatus, errorThrown) {
+			alert('No se pudieron obtener los juegos actuales. Por favor intenta mas tarde.');
+		});
+	
+	function agregarJuego(juego) {
+		var $div = $("<div class='partida'/>");
+		$div.load('dashboard_partida.html',
+			function(response) {
+				$div.find('.thumb').attr('src', "http://graph.facebook.com/" + juego.opponent_game.user.facebook_id + "/picture?width=250&height=250");
+				$div.find('.nombre').html(juego.opponent_game.user.first_name);
+				
+				switch(juego.board.status) {
+					case 'Mi Turno':
+						$div.find('.mensaje').html('¡ES TU TURNO!');
+						$div.find('.estado').addClass('tu_turno');
+						break;
+					case 'Su Turno':
+						$div.find('.mensaje').html('Es su turno');
+						$div.find('.estado').addClass('su_turno');
+						break;
+					case 'Abandono':
+						$div.find('.mensaje').html('Abandonó');
+						$div.find('.estado').addClass('abandono');
+						break;
+				}
+				var ultimoMovimiento = new Date(juego.updated_at);
+				var hoy = new Date();
+				var diff = (hoy - ultimoMovimiento);
+				
+				var dias = diff / (24 * 60 * 60 * 1000);
+				var horas = diff / (60 * 60 * 1000);
+				
+				if (dias >= 1) {
+					$div.find('.actualizacion').html('Hace ' + Math.floor(dias) + ' días');
+				} else {
+					$div.find('.actualizacion').html('Hace ' + Math.floor(horas) + ' horas');
+				}
+				
+				// Se inicializan los clicks.
+				$div.click(function(event) {
+					setCache('juego', juego);
+					abrirTemplate('juego.html');
+				});
+				$div.find('.btn_borrar').click(function(event) {
+					confirmacion(juego.id);
+					event.stopImmediatePropagation();
+				});
+				
+				// Se agrega el div a la lista y se activa el evento de swipeleft.
+				$('#cuadro_negro').append($div);
+				$(".estado").swipeleft(function(event) {
+					$('.botones').hide();
+					$(event.target).children('.botones').show();
+				});
+			});
+	}
+	
+	// Funcionalidad de los botones de borrar
 	function confirmacion(partida) {
 		alert('¿Deseas abandonar esta partida? Se perderan todos los datos.',
 			 ALERTA_SI_NO,
@@ -27,7 +90,7 @@
 		<div id="menu">
 			<div id="mnu_monedas">
 				<img id="fondo_monedas" src="img/db_monedas.png" />
-				<div id="total_monedas">1000000</div>
+				<div id="total_monedas"></div>
 			</div>
 			<div id="mnu_botones">
 				<img id="btn_nuevo_juego" src="img/db_btn_nuevo_juego.png" onclick="abrirTemplate('juegoNuevo.html');" />
@@ -37,7 +100,7 @@
 	</div>
 	<div class="derecha">
 		<div id="cuadro_negro">
-			<div class="partida" onclick="abrirTemplate('juego.html');">
+			<!-- div class="partida" onclick="abrirTemplate('juego.html');">
 				<div class="carta jugador">
 					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
 					<span class="nombre">JugadorA</span>
@@ -47,54 +110,7 @@
 					<span class="actualizacion">Hace N días</span>
 					<div class="botones" onclick="confirmacion(1)">Borrar</div>
 				</div>
-			</div>
-			<div id="someDiv" style="display: none;">
-				Algo
-			</div>
-			<div class="partida">
-				<div class="carta jugador">
-					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
-					<span class="nombre">JugadorB</span>
-				</div>
-				<div class="estado su_turno">
-					<span class="mensaje">SU TURNO</span>
-					<span class="actualizacion">Hace N días</span>
-					<div class="botones" onclick="confirmacion(2)">Borrar</div>
-				</div>
-			</div>
-			<div class="partida">
-				<div class="carta jugador">
-					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
-					<span class="nombre">JugadorC</span>
-				</div>
-				<div class="estado abandono">
-					<span class="mensaje">ABANDONÓ EL JUEGO</span>
-					<span class="actualizacion">Hace N días</span>
-					<div class="botones" onclick="confirmacion(3)">Borrar</div>
-				</div>
-			</div>
-			<div class="partida">
-				<div class="carta jugador">
-					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
-					<span class="nombre">JugadorD</span>
-				</div>
-				<div class="estado su_turno">
-					<span class="mensaje">SU TURNO</span>
-					<span class="actualizacion">Hace N días</span>
-					<div class="botones" onclick="confirmacion(4)">Borrar</div>
-				</div>
-			</div>
-			<div class="partida">
-				<div class="carta jugador">
-					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
-					<span class="nombre">JugadorE</span>
-				</div>
-				<div class="estado tu_turno">
-					<span class="mensaje">¡ES TU TURNO!</span>
-					<span class="actualizacion">Hace N días</span>
-					<div class="botones" onclick="confirmacion(5)">Borrar</div>
-				</div>
-			</div>
+			</div -->
 		</div>
 	</div>
 </div>

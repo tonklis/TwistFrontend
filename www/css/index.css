@@ -199,6 +199,8 @@ body {
 	box-shadow:         0.2em 0.2em 0.6em #000000;
 	
 	text-align: center;
+	
+	overflow: auto;
 }
 
 .alerta .alerta_mensaje {
@@ -404,11 +406,18 @@ body {
 }
 
 .estado .botones {
-	position: absolute;
 	display: none;
+}
+
+.estado .botones .btn_borrar {
+	position: absolute;
 	
-	top: 40%;
+	top: 30%;
 	right: 10%;
+	
+	width: 30%;
+	
+	z-index: 20;
 }
 
 .partida .tu_turno {

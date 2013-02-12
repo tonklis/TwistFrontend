@@ -1,10 +1,129 @@
 <script>
 	// Javascript que se ejecute al iniciar la página.
-    mostrandoSC = false;
+    var mostrandoSC = false;
+	var filtroJugando = false;
     var posicionSeleccionada = null;
     
-    crearOponentes($('#cuadro_negro'));
+    crearOponentes();
     
+    // funciones para inicializar la lista de oponentes
+    function crearOponentes() {
+		FB.api('fql',
+			{ q : "SELECT uid, name FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) ORDER BY name asc"},
+			function(response) {
+				if (response.data !== undefined) {
+					var amigos = response.data;
+					var partidas = getCache('partidas');
+					for (var i = 0; i < partidas.length; i++) {
+						for (var j = 0; j < amigos.length; j++) {
+							if (partidas[i].opponent_game.user.facebook_id == amigos[j].uid) {
+								amigos.splice(j, 1);
+								break;
+							}
+						}
+					}
+					
+					var listaAmigos = new Array();
+					for (var i = 0; i < amigos.length; i++) {
+						listaAmigos.push(amigos[i].uid);
+					}
+					var params = {
+						facebook_ids : listaAmigos.toString()
+					};
+					obtenerAmigosJugando(params,
+						function (response, textStatus, jqXHR) {
+							var amigosObj = new Array();
+							for (var i = 0; i < amigos.length; i++) {
+								amigosObj.push({
+									id : amigos[i].uid,
+									description : amigos[i].name,
+									url: "http://graph.facebook.com/" + amigos[i].uid + "/picture?width=250&height=250",
+									jugando : estaJugando(response, amigos[i].uid)
+								});
+							}
+							setCache('amigos', amigosObj);
+							$('.derecha').html(getGridOponentes());
+							loaderCartas();
+						});
+				} else {
+					alert("No se pudo obtener la lista de tus amigos. Por favor intenta hacer un evento nuevamente.");
+					inicio();
+				}
+			}
+		);
+	}
+	
+	function estaJugando(amigos, id) {
+		for (var i = 0; i < amigos.length; i++) {
+			if (amigos[i].facebook_id == id) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	function getGridOponentes() {
+		var html = $('<div id="cuadro_negro">');
+		var amigos = getCache('amigos');
+		
+		var primeraLetra = '';
+		for (var i = 0; i < amigos.length; i++) {
+			if (amigos[i].description.charAt(0).toUpperCase() != primeraLetra) {
+				primeraLetra = amigos[i].description.charAt(0).toUpperCase();
+				html.append('<div id="letra_' + primeraLetra + '" class="carta cartaTablero cartaShortcut" onclick="mostrarShortcut(\'letra_' + primeraLetra + '\');"><span class="letra">' + primeraLetra + '</span></div>');
+			}
+			var clase = "cartaOponente";
+			if (amigos[i].jugando) {
+				clase += " oponenteJugando";
+				html.find('.cartaShortcut:last').addClass('shortcutJugando');
+			}
+			html.append(obtieneCarta(amigos[i], i, 'seleccionarOponente(' + i + ')', clase));
+		}
+		
+		return html;
+	}
+	
+	// Funciones que ayudan a filtrar la lista y los shortcuts a las letras.
+	function filtrar(tipo) {
+    	switch(tipo) {
+    		case 'jugando':
+    			mostrandoSC = false;
+    			filtroJugando = true;
+    			$('.cartaShortcut').hide();
+    			$('.cartaOponente').hide();
+    			$('.shortcutJugando').show();
+    			$('.oponenteJugando').show();
+    			break;
+    		case 'todos':
+    		default:
+    			mostrandoSC = false;
+    			filtroJugando = false;
+    			$('.cartaShortcut').show();
+    			$('.cartaOponente').show();
+    			break;
+    	}
+    }
+    
+    function mostrarShortcut(idLetra) {
+		mostrandoSC = !mostrandoSC;
+		if (mostrandoSC) {
+			$('.cartaOponente').hide();
+			$('#' + idLetra).parent().scrollTop(0);
+		} else {
+			if (filtroJugando) {
+				$('.oponenteJugando').show();
+			} else {
+				$('.cartaOponente').show();
+			}
+			recorrerShortcut(idLetra);
+		}
+	}
+	
+	function recorrerShortcut(idLetra) {
+		$('#' + idLetra).parent().scrollTop($('#' + idLetra).position().top);
+	}
+	
+	// Funciones para seleccionar el oponente.
     function seleccionarOponente(posicion) {
         if (posicionSeleccionada != null) {
         	$('.cartaTablero[posicion="' + posicionSeleccionada + '"]').removeClass('cartaSeleccionada');
@@ -21,7 +140,7 @@
     function continuar() {
         if (posicionSeleccionada != null) {
         	setCache('nuevo_oponente', $('.carta[posicion="' + posicionSeleccionada + '"]').attr('id'));
-            seleccionarTablero();
+            abrirTemplate('juegoNuevoTablero.html');
         } else {
             alert('Debes seleccionar tu oponente para continuar.');
         }
@@ -32,6 +151,10 @@
 		<div id="menu">
 			<div id="mnu_carta"><img class="instruccion" src="img/nu_selecciona_oponente.png"/></div>
 			<div id="mnu_botones">
+				<div class="mnu_botones_small">
+					<img id="btn_amigos_fb" src="img/nu_amigos_fb.png" onclick="filtrar('todos');" />
+    	            <img id="btn_amigos_jugando" src="img/nu_amigos_jugando.png" onclick="filtrar('jugando');" />
+                </div>
 				<img id="btn_continuar" src="img/btn_continuar.png" onclick="continuar()" />
                 <img id="btn_salir" src="img/btn_salir.png" onclick="inicio()" />
 			</div>

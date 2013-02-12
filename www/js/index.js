@@ -53,7 +53,6 @@ var paginaIndex = "index.html";
 var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
 var templateDashboard = "dashboard.html";
-var templateTablero = "juegoNuevoTablero.html";
 
 var appId = "336541486458847";
 var sistemaOperativo = "iOS"; //iOS
@@ -75,19 +74,35 @@ function init() {
 	if (networkState == Connection.NONE || networkState == Connection.UNKNOWN) {
 		mostrarSinConexion();
 	} else {
+		inicializar();
 		FB.init({ appId: appId, nativeInterface: CDV.FB, useCachedDialogs: false });
 		FB.getLoginStatus(
 			function (response) {
 				if (response.status == 'connected') {
-					if (!isCache('idUsuario')) {
+					if (!isCache('usuario')) {
 						FB.api('/me', function (me) {
-							if (me.id) {
-								setCache('usuario', me);
-							}
-							checkPermissions();
+							checkPermissions(function() {
+								var params = {
+									facebook_id	: me.id,
+									first_name	: me.first_name,
+									last_name	: me.last_name,
+									email		: me.email
+								};
+								invocarLogin(params,
+									function (response, textStatus, jqXHR) {
+										setCache('usuario', response);
+										iniciarProceso();
+									},
+									function(jqXHR, textStatus, errorThrown) {
+										alert('No pudimos conectarnos con el servidor de Adivina-Me, vuelve a intentarlo mas tarde.');
+										mostrarConectar();
+									});
+							});
 						});
 					} else {
-						checkPermissions();
+						checkPermissions(function() {
+							iniciarProceso();
+						});
 					}
 				} else {
 					mostrarConectar();
@@ -96,7 +111,7 @@ function init() {
 	}
 }
 
-function checkPermissions() {
+function checkPermissions(funcionSuccess) {
 	FB.api('/me/permissions',
 		function (response) {
 			var error = false;
@@ -106,16 +121,20 @@ function checkPermissions() {
 			} else {
 				perms = response.data[0];
 			}
-			if (!(perms && perms.read_stream && perms.publish_stream)) {
+			if (!(perms && perms.read_stream && perms.publish_stream && perms.email)) {
 				error = true;
 			}
 			
 			if (error) {
 				mostrarConectar();
 			} else {
-				iniciarProceso();
+				funcionSuccess();
 			}
 		});
+}
+
+function inicializar() {
+	// Sobreescribir con las acciones antes de continuar con el proceso de Facebook.
 }
 
 function iniciarProceso() {
@@ -137,7 +156,7 @@ function login() {
 				alert("Tienes que conectar la aplicación a Facebook para poder continuar.");
 			}
 		},
-		{ scope: "read_stream,publish_stream"}
+		{ scope: "read_stream,publish_stream,email"}
 	);
 }
 
@@ -197,6 +216,30 @@ function abrirTemplate(template) {
 	$('#content_load').load(template).hide().fadeIn('slow');
 }
 
+function obtenPrimerNombre(nombre) {
+	if (nombre.indexOf(' ') > 0) {
+		return nombre.substring(0, nombre.indexOf(' '));
+	}
+	return nombre;
+}
+
+function obtieneCarta(elemento, posicion, onclick, clases) {
+	if (onclick === undefined) {
+		onclick = '';
+	}
+	if (clases === undefined) {
+		clases = '';
+	}
+	return '<div id="' + elemento.id + '" class="carta cartaTablero ' + clases + '" posicion="' + posicion + '" onclick="' + onclick + '"><div class="front"><img id="thumb_loading_' + posicion + '" class="thumb_loading" src="img/loading.gif" /><img id="thumb_' + posicion + '" id_loader="thumb_loading_' + posicion + '" class="thumb" src="' + elemento.url + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(elemento.description), 10) + '</span></div><div class="back"><img src="img/ju_carta_logo.png"/></div></div>';
+}
+
+function loaderCartas() {
+	// Loader mientras cargan las cartas
+	$('.thumb').load(function(event) {
+		$('#' + $(event.target).attr('id_loader')).hide();
+	});
+}
+
 /** Funciones para cache **/
 function setCache(key, value) {
 	window.localStorage.setItem(key, JSON.stringify(value));
@@ -231,100 +274,6 @@ function clearCache() {
 	
 	removeCache('nuevo_oponente');
 }
-
-/** Funciones para Nueva Partida **/
-function updateArrayAmigos(amigosFB) {
-    amigos = new Array();
-                          
-    for (var i=0; i <amigosFB.length; i++) {
-        amigos.push({"id":amigosFB[i].uid, "nombre":amigosFB[i].name, "ruta": "http://graph.facebook.com/" + amigosFB[i].uid + "/picture?width=250&height=250"});
-    }
-    
-    return amigos;
-}
-
-function obtenPrimerNombre(nombre) {
-	if (nombre.indexOf(' ') > 0) {
-		return nombre.substring(0, nombre.indexOf(' '));
-	}
-	return nombre;
-}
-
-function getGridOponentes() {
-    var html = '';
-    var amigos = getCache('amigos');
-    
-    var primeraLetra = '';
-    for (var i = 0; i < amigos.length; i++) {
-    	if (amigos[i].nombre.charAt(0).toUpperCase() != primeraLetra) {
-    		primeraLetra = amigos[i].nombre.charAt(0).toUpperCase();
-    		html += '<div id="letra_' + primeraLetra + '" class="carta cartaTablero cartaShortcut" onclick="mostrarShortcut(\'letra_' + primeraLetra + '\');"><span class="letra">' + primeraLetra + '</span></div>';
-    	}
-        // html += '<div id="' + amigos[i].id + '" class="carta cartaTablero cartaOponente" posicion="' + i + '" onclick="seleccionarOponente(' + i + ')"><img id="thumb_loading_' + i + '" class="thumb_loading" src="img/loading.gif" /><img id="thumb_' + i + '" id_loader="thumb_loading_' + i + '" class="thumb" src="' + amigos[i].ruta + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(amigos[i].nombre), 10) + '</span></div>';
-        html += obtieneCarta(amigos[i], i, 'seleccionarOponente(' + i + ')', 'cartaOponente');
-    }
-                          
-    return html;
-}
-
-function obtieneCarta(elemento, posicion, onclick, clases) {
-	if (onclick === undefined) {
-		onclick = '';
-	}
-	if (clases === undefined) {
-		clases = '';
-	}
-	return '<div id="' + elemento.id + '" class="carta cartaTablero ' + clases + '" posicion="' + posicion + '" onclick="' + onclick + '"><div class="front"><img id="thumb_loading_' + posicion + '" class="thumb_loading" src="img/loading.gif" /><img id="thumb_' + posicion + '" id_loader="thumb_loading_' + posicion + '" class="thumb" src="' + elemento.ruta + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(elemento.nombre), 10) + '</span></div><div class="back"><img src="img/ju_carta_logo.png"/></div></div>';
-}
-
-var mostrandoSC = false;
-function mostrarShortcut(idLetra) {
-	mostrandoSC = !mostrandoSC;
-	if (mostrandoSC) {
-		$('.cartaOponente').hide();
-		$('#' + idLetra).parent().scrollTop(0);
-	} else {
-		$('.cartaOponente').show();
-		recorrerShortcut(idLetra);
-	}
-}
-
-function recorrerShortcut(idLetra) {
-	$('#' + idLetra).parent().scrollTop($('#' + idLetra).position().top);
-}
-
-function loaderCartas() {
-	// Loader mientras cargan las cartas
-	$('.thumb').load(function(event) {
-		$('#' + $(event.target).attr('id_loader')).hide();
-	});
-}
-
-function seleccionarTablero(tipoTablero) {
-    if (!tipoTablero) {
-        tipoTablero = 'personajes';
-    }
-    setCache('tipoTablero', tipoTablero);
-	abrirTemplate(templateTablero);
-}
-
-function crearOponentes(contenedor) {
-	FB.api('fql',
-		{ q : "SELECT uid, name, pic_square FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) ORDER BY name asc"},
-		function(response) {
-			if (response.data !== undefined) {
-				amigos = updateArrayAmigos(response.data);
-                setCache('amigos', amigos);
-                contenedor.html(getGridOponentes());
-                loaderCartas();
-			} else {
-				alert("No se pudo obtener la lista de tus amigos. Por favor intenta hacer un evento nuevamente.");
-				inicio();
-			}
-		}
-	);
-}
-
 
 /** ALERTAS **/
 var funciones;

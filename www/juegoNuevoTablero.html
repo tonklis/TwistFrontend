@@ -1,60 +1,38 @@
 <script>
     var posicionSeleccionada = null;
-	
-    // Primero se obtiene la lista de amigos, personajes y famosos si no se tiene en cache. Si ya existe en cache se recupera de la misma
-    var personajes = new Array();
-    
-    for (var i=0; i < 4; i++) {
-		var objeto = {};
-		objeto.id = '' + (i * 6);
-		objeto.nombre = "Lentes";
-		objeto.ruta = "img/personajes/lentes.png";
-		personajes.push(objeto);
-		var objeto = {};
-		objeto.id = '' + (i * 6) + 1;
-		objeto.nombre = "Seniora";
-		objeto.ruta = "img/personajes/seniora.png";
-		personajes.push(objeto);
-		var objeto = {};
-		objeto.id = '' + (i * 6) + 2;
-		objeto.nombre = "David";
-		objeto.ruta = "img/personajes/david.png";
-		personajes.push(objeto);
-		var objeto = {};
-		objeto.id = '' + (i * 6) + 3;
-		objeto.nombre = "Jake";
-		objeto.ruta = "img/personajes/jake.png";
-		personajes.push(objeto);
-		var objeto = {};
-		objeto.id = '' + (i * 6) + 4;
-		objeto.nombre = "Cesar";
-		objeto.ruta = "img/personajes/cesar.png";
-		personajes.push(objeto);
-		var objeto = {};
-		objeto.id = '' + (i * 6) + 5;
-		objeto.nombre = "Jimena";
-		objeto.ruta = "img/personajes/jimena.png";
-		personajes.push(objeto);
-    }
         
-    var famosos = new Array();
-    var amigos = getCache('amigos');
-    
     // Obtenemos el tipo de tablero que se debe generar
     var tipoTablero = getCache('tipoTablero');
-
-    // Generamos el tablero con cartas aleatorias
-    var tablero = generarTablero(tipoTablero);
     
-    // Desplegamos el tablero generado
-    muestraTablero(tablero);
+    // Obtenemos todos los personajes y famosos con los que se generarán los tableros y los desplegamos
+    getTablero();
     
-    function muestraTablero(tablero) {
+    function seleccionarTablero(tipoTablero) {
+        if (!tipoTablero) {
+            tipoTablero = 'personajes';
+        }
+        setCache('tipoTablero', tipoTablero);
+        abrirTemplate('juegoNuevoTablero.html');
+    }
+        
+    function getTablero(){
+        obtenerCartasPorId({'id':1}, function(responseFamosos){
+                                setCache('famosos', responseFamosos);
+                                obtenerCartasPorId({'id':2}, function(responsePersonajes){
+                                                        setCache('personajes', responsePersonajes);
+                                                        var tablero = generarTablero(tipoTablero);
+                                                        mostrarTablero(tablero);
+                                                   }, funcionError);
+                           }, funcionError);
+    }
+    
+    
+    
+    function mostrarTablero(tablero) {
         var cuadro_negro = '';
         
         for (var i = 0; i < 20; i++) {
         	cuadro_negro += obtieneCarta(tablero[i], i, 'seleccionarPersonaje(' + i + ')');
-            // cuadro_negro = cuadro_negro + '<div id="' + tablero[i].id + '" class="carta cartaTablero" posicion="' + i + '" onclick="seleccionarPersonaje(' + i + ')"><img id="thumb_loading_' + i + '" class="thumb_loading" src="img/loading.gif" /><img id="thumb_' + i + '" id_loader="thumb_loading_' + i + '" class="thumb" src="' + tablero[i].ruta + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(tablero[i].nombre), 10) + '</span></div>';
         }
         
         $('#cuadro_negro').html(cuadro_negro);
@@ -64,23 +42,23 @@
     function generarTablero(tipoTablero) {
         // Arreglo que contiene las 20 cartas que conformarán el tablero
         var tablero = new Array();
-        
+                        
         switch(tipoTablero) {
             case 'personajes':
-            	cartas = personajes;
+                cartas = getCache('personajes');
             	break;
             case 'famosos':
-            	cartas = famosos;
+            	cartas = getCache('famosos');
             	break;
             case 'amigos':
-            	cartas = amigos;
+            	cartas = getCache('amigos');
             	break;
             default:
             	break;
         }
-        
+                
         cartas.sort( function() { return 0.5 - Math.random() } );
-        
+                
         for (var i=0; i <20; i++) {
             tablero.push(cartas[i]);
         }
@@ -112,7 +90,7 @@
     }
     
     function crearXML() {
-    	var jugador1 = getCache('usuario').id;
+    	var jugador1 = getCache('usuario').facebook_id;
     	var jugador2 = getCache('nuevo_oponente');
     	var tipo = getCache('tipoTablero');
     	
@@ -130,6 +108,10 @@
     	xml += '</partida>';
     	
     	return xml;
+    }
+    
+    function funcionError(response){
+        alert('Lo sentimos, hubo un error al cargar el tablero');
     }
 </script>
 <div id="seleccionTablero">
