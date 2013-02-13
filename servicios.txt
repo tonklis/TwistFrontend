@@ -46,8 +46,22 @@ http://still-eyrie-7957.herokuapp.com/games/start.json
 Params:
 	user_id = El id del usuario creando el juego
 	detail_xml = El xml del tablero (como string)
-	card_id = El id de la tarjeta seleccionada
+	card_id = El id de la tarjeta seleccionada (si se conoce)
+	card_type = El tipo de tarjeta (1 = Famosos, 2 = Personajes, 3 = Amigo Facebook")
+	card_facebook_id = El id de facebook del amigo seleccionado como tarjeta (solo si el card_type = 3)
+	card_name = El nombre del amigo seleccionado como tarjeta (solo si el card_type = 3)
 	opponent_id = El facebook_id del oponente (string)
 	opponent_name = El first name del oponente
 Regresa:
 	El juego creado como un objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
+	
+- Acepta juego
+http://still-eyrie-7957.herokuapp.com/games/start/ID.json
+Params:
+	ID(en el url) = El id del juego
+	card_id = El id de la tarjeta seleccionada (si se conoce)
+	card_type = El tipo de tarjeta (1 = Famosos, 2 = Personajes, 3 = Amigo Facebook")
+	card_facebook_id = El id de facebook del amigo seleccionado como tarjeta (solo si el card_type = 3)
+	card_name = El nombre del amigo seleccionado como tarjeta (solo si el card_type = 3)
+Regresa:
+	El juego actualizado como objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
