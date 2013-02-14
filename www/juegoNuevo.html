@@ -1,7 +1,10 @@
 <script>
 	// Javascript que se ejecute al iniciar la página.
+	$('#loading').show();
+	
     var mostrandoSC = false;
 	var filtroJugando = false;
+	var amigosJugando = 0;
     var posicionSeleccionada = null;
     
     crearOponentes();
@@ -9,7 +12,7 @@
     // funciones para inicializar la lista de oponentes
     function crearOponentes() {
 		FB.api('fql',
-			{ q : "SELECT uid, name FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) ORDER BY name asc"},
+			{ q : "SELECT uid, name, first_name FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) ORDER BY first_name asc"},
 			function(response) {
 				if (response.data !== undefined) {
 					var amigos = response.data;
@@ -34,16 +37,22 @@
 						function (response, textStatus, jqXHR) {
 							var amigosObj = new Array();
 							for (var i = 0; i < amigos.length; i++) {
+								var jugando = estaJugando(response, amigos[i].uid);
+								if (jugando) {
+									amigosJugando++;
+								}
 								amigosObj.push({
 									id : amigos[i].uid,
-									description : amigos[i].name,
-									url: "http://graph.facebook.com/" + amigos[i].uid + "/picture?width=250&height=250",
-									jugando : estaJugando(response, amigos[i].uid)
+									description : amigos[i].first_name,
+									url : "http://graph.facebook.com/" + amigos[i].uid + "/picture?width=250&height=250",
+									template_id : TIPO_CARTA_AMIGO,
+									jugando : jugando
 								});
 							}
 							setCache('amigos', amigosObj);
 							$('.derecha').html(getGridOponentes());
 							loaderCartas();
+							$('#loading').hide();
 						});
 				} else {
 					alert("No se pudo obtener la lista de tus amigos. Por favor intenta hacer un evento nuevamente.");
@@ -87,12 +96,16 @@
 	function filtrar(tipo) {
     	switch(tipo) {
     		case 'jugando':
-    			mostrandoSC = false;
-    			filtroJugando = true;
-    			$('.cartaShortcut').hide();
-    			$('.cartaOponente').hide();
-    			$('.shortcutJugando').show();
-    			$('.oponenteJugando').show();
+    			if (amigosJugando == 0) {
+    				alert('Ya tienes partidas con todos los amigos que están jugando. Invita a alguien más a utilizar la aplicación.');
+    			} else {
+					mostrandoSC = false;
+					filtroJugando = true;
+					$('.cartaShortcut').hide();
+					$('.cartaOponente').hide();
+					$('.shortcutJugando').show();
+					$('.oponenteJugando').show();
+    			}
     			break;
     		case 'todos':
     		default:
@@ -139,7 +152,11 @@
     
     function continuar() {
         if (posicionSeleccionada != null) {
-        	setCache('nuevo_oponente', $('.carta[posicion="' + posicionSeleccionada + '"]').attr('id'));
+        	var oponente = {
+        		id : $('.carta[posicion="' + posicionSeleccionada + '"]').attr('id'),
+        		nombre : $('.carta[posicion="' + posicionSeleccionada + '"]').find('.nombre').attr('nombre')
+        	};
+        	setCache('nuevo_oponente', oponente);
             abrirTemplate('juegoNuevoTablero.html');
         } else {
             alert('Debes seleccionar tu oponente para continuar.');

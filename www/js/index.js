@@ -59,6 +59,14 @@ var sistemaOperativo = "iOS"; //iOS
 // var sistemaOperativo = "iOS"; //Android
 var agente = navigator.userAgent;
 
+var TIPO_CARTA_FAMOSO = 1;
+var TIPO_CARTA_PERSONAJE = 2;
+var TIPO_CARTA_AMIGO = 3;
+
+var ACCION_NUEVO = 2;
+var ACCION_PREGUNTA = 3;
+var ACCION_ADIVINA = 4;
+
 /** Inicializa listeners para eventos **/
 document.addEventListener("offline", redirigirSinConexion, false);
 document.addEventListener("deviceready", init, false);
@@ -70,12 +78,18 @@ function redirigirSinConexion() {
 
 /** Funciones para FB **/
 function init() {
-	var networkState = navigator.network.connection.type;
+	var networkState = navigator.connection.type;
 	if (networkState == Connection.NONE || networkState == Connection.UNKNOWN) {
 		mostrarSinConexion();
 	} else {
 		inicializar();
-		FB.init({ appId: appId, nativeInterface: CDV.FB, useCachedDialogs: false });
+		FB.init({
+			appId : appId,
+			nativeInterface : CDV.FB,
+			oauth : true,
+			useCachedDialogs : false,
+			frictionlessRequests : true
+		});
 		FB.getLoginStatus(
 			function (response) {
 				if (response.status == 'connected') {
@@ -147,6 +161,7 @@ function mostrarConectar() {
 }
 
 function login() {
+	playAudio('click');
 	FB.login(
 		function (response) {
 			if (response.authResponse) {
@@ -212,8 +227,19 @@ function limitaTexto(cadena, longitud) {
 	return resultado;
 }
 
+var current_template = 0;
 function abrirTemplate(template) {
-	$('#content_load').load(template).hide().fadeIn('slow');
+	playAudio('click');
+	current_template++;
+	var number_template = current_template;
+	load_template = $.ajax({
+		url: template,
+		success: function(data) {
+			if (number_template == current_template) {
+				$("#content_load").html(data).hide().fadeIn('slow');
+			}
+		}
+	});
 }
 
 function obtenPrimerNombre(nombre) {
@@ -230,7 +256,7 @@ function obtieneCarta(elemento, posicion, onclick, clases) {
 	if (clases === undefined) {
 		clases = '';
 	}
-	return '<div id="' + elemento.id + '" class="carta cartaTablero ' + clases + '" posicion="' + posicion + '" onclick="' + onclick + '"><div class="front"><img id="thumb_loading_' + posicion + '" class="thumb_loading" src="img/loading.gif" /><img id="thumb_' + posicion + '" id_loader="thumb_loading_' + posicion + '" class="thumb" src="' + elemento.url + '"/><span class="nombre">' + limitaTexto(obtenPrimerNombre(elemento.description), 10) + '</span></div><div class="back"><img src="img/ju_carta_logo.png"/></div></div>';
+	return '<div id="' + elemento.id + '" class="carta cartaTablero ' + clases + '" posicion="' + posicion + '" tipo="' + elemento.template_id + '" onclick="' + onclick + '"><div class="front"><img id="thumb_loading_' + posicion + '" class="thumb_loading" src="img/loading_150.gif" /><img id="thumb_' + posicion + '" id_loader="thumb_loading_' + posicion + '" class="thumb" src="' + elemento.url + '"/><span class="nombre" nombre="' + elemento.description + '">' + limitaTexto(obtenPrimerNombre(elemento.description), 10) + '</span></div><div class="back"><img src="img/ju_carta_logo.png"/></div></div>';
 }
 
 function loaderCartas() {
@@ -250,7 +276,7 @@ function getCache(key) {
 }
 
 function isCache(key) {
-	return window.localStorage.getItem(key) !== null;
+	return window.localStorage.getItem(key) !== null && window.localStorage.getItem(key) !== undefined;
 }
 
 function removeCache(key) {
@@ -284,6 +310,8 @@ var ALERTA_NUEVO_JUEGO = 'NUEVO_JUEGO';
 var ALERTA_INPUT = 'INPUT';
 
 function alert(texto, tipo, acciones) {
+	playAudio('alert');
+	
 	if (texto === undefined) {
 		texto = '';
 	}
@@ -309,26 +337,110 @@ function cerrarAlert() {
 }
 
 function ejecutaFuncion(nombre) {
+	playAudio('click');
 	if (funciones[nombre]) {
 		funciones[nombre]();
 	}
 	cerrarAlert();
 }
 
-
 /** Funciones de sonido **/
+var audio_flip;
+var audio_alerta;
+var audio_click;
+
 function createAudio(name) {
-    var src;
-    switch(name) {
-        case 'card_flip':
-            src = 'audio/card_flip.wav';
-            break;
-        default:
-            break;         
-    }
-	      
-    // Create Media object from src
-    my_media = new Media(src, function(){}, function(){});
-                          
-    return my_media;        
+	var src;
+	switch(name) {
+		case 'flip':
+			src = 'audio/flip.wav';
+			break;
+		case 'alert':
+			src = 'audio/alerta.wav';
+			break;
+		case 'click':
+			src = 'audio/click.wav';
+			break;
+		default:
+			break;         
+	}
+		  
+	// Create Media object from src
+	my_media = new Media(src, function(){}, function(){});
+						  
+	return my_media;    
 }
+
+function playAudio(name) {
+	if (getCache('aj_sonido')) {
+		var src;
+		switch(name) {
+			case 'flip':
+				if (audio_flip) {
+					audio_flip.play();
+				} else {
+					audio_flip = createAudio('flip');
+					audio_flip.play();
+				}
+				break;
+			case 'alert':
+				if (audio_alerta) {
+					audio_alerta.play();
+				} else {
+					audio_alerta = createAudio('alert');
+					audio_alerta.play();
+				}
+				break;
+			case 'click':
+				if (audio_click) {
+					audio_click.play();
+				} else {
+					audio_click = createAudio('click');
+					audio_click.play();
+				}
+				break;
+			default:
+				break;         
+		}
+	}      
+}
+
+/** Funciones de FB **/
+function enviarPostFB(facebook_id, funcionSuccess) {
+	if (getCache('aj_post')) {
+		FB.ui({
+			method: 'feed',
+			to: facebook_id,
+			redirect_uri: 'http://apps.facebook.com/Adivina_Me/',
+			link: 'http://apps.facebook.com/Adivina_Me/',
+			picture: 'http://fbrell.com/f8.jpg',
+			name: 'Adivina-Me',
+			caption: '¡Te desafío en Adivina-Me!',
+			description: 'Adivina el personaje que elegí en menos intentos que yo.'
+        },
+        function(response) {
+			funcionSuccess(response);
+        });
+	} else {
+		funcionSuccess(true);
+	}
+}
+
+/** Funciones para inputs y textareas **/
+var needsScrollUpdate = false;
+
+$(document).scroll(function() {
+	if (needsScrollUpdate) {
+		setTimeout(function() {
+			$("body").css("height", "+=1").css("height", "-=1");
+		}, 0);
+	}
+});
+
+$("input, textarea").live("focus", function(e) {
+	needsScrollUpdate = true;
+});
+
+$("input, textarea").live("blur", function(e) {
+	needsScrollUpdate = false;
+});

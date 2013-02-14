@@ -1,17 +1,21 @@
 <script>
-    
+	$('#loading').show();
+	
     // Obtenemos el xml del juego
-    var backend_accion_oponente = 'pregunta';
-    var backend_accion_oponente_data = '¿Tu personaje es una ardilla musculosa?';
-    var xml = '<partida id="1" jugador1="574865437" jugador2="000000000" turno="574865437"><tablero tipo="personaje"><carta posicion="0" id="0" url="img/personajes/pilar.png" description="Pilar"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="1" id="1" url="img/personajes/david.png" description="David"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>abierto</estatusJugador2></carta><carta posicion="2" id="2" url="img/personajes/lentes.png" description="Lentes"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="3" id="3" url="img/personajes/seniora.png" description="Señora"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="4" id="4" url="img/personajes/jake.png" description="Jake"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="5" id="5" url="img/personajes/cesar.png" description="Cesar"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>abierto</estatusJugador2></carta><carta posicion="6" id="6" url="img/personajes/gaby.png" description="Gaby"><estatusJugador1>cerrado</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="7" id="7" url="img/personajes/mario.png" description="Mario"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="8" id="8" url="img/personajes/andy.png" description="andy"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>abierto</estatusJugador2></carta><carta posicion="9" id="9" url="img/personajes/niniocolor.png" description="Niño Color"><estatusJugador1>cerrado</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="10" id="10" url="img/personajes/marcela.png" description="Marcela"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="11" id="11" url="img/personajes/sarah.png" description="Sarah"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>abierto</estatusJugador2></carta><carta posicion="12" id="12" url="img/personajes/humberto.png" description="Humberto"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="13" id="13" url="img/personajes/bigote.png" description="Bigote"><estatusJugador1>cerrado</estatusJugador1><estatusJugador2>abierto</estatusJugador2></carta><carta posicion="14" id="14" url="img/personajes/hector.png" description="Hector"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="15" id="15" url="img/personajes/paco.png" description="Paco"><estatusJugador1>cerrado</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="16" id="16" url="img/personajes/alejandro.png" description="Alejandro"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>abierto</estatusJugador2></carta><carta posicion="17" id="17" url="img/personajes/arturo.png" description="Arturo"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>abierto</estatusJugador2></carta><carta posicion="18" id="18" url="img/personajes/roberto.png" description="Roberto"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>cerrado</estatusJugador2></carta><carta posicion="19" id="19" url="img/personajes/salvador.png" description="Salvador"><estatusJugador1>abierto</estatusJugador1><estatusJugador2>abierto</estatusJugador2></carta></tablero></partida>';
+    var juego = getCache('juego');
     
-    var xmlDoc = $.parseXML(xml);
+    var xmlDoc = $.parseXML(juego.board.detail_xml);
     var xml = $(xmlDoc);
+    
+    var miTarjeta = juego.card_id;
+    var totalPreguntas = juego.question_count;
+    var ultimaAccion = ACCION_NUEVO;
     
     var miTurno = getMiTurno();
     var noJugador = getNoJugador();
     
     // Desplegamos los botones dependiendo de a quien le toca jugar
+    $('#total_preguntas').html(totalPreguntas + ' / 5');
     muestraBotones();
     
     // Desplegamos el tablero generado
@@ -23,11 +27,11 @@
     // Asignamos la funcionalidad de flip cuando se hace click
     seleccionarAccionClick('flip');
     
-    function getMiTurno() {        
-        if (getCache('usuario').facebook_id == xml.find('partida').attr('turno')) {
-            return true;
-        } else {
+    function getMiTurno() {
+        if (getCache('usuario').id == juego.board.last_action) {
             return false;
+        } else {
+            return true;
         }
     }
     
@@ -41,32 +45,33 @@
     
     function muestraBotones() {
         var mnu_botones = '';
-        
-        mnu_botones = mnu_botones + '<img id="juego_preguntas" src="img/ju_preguntas.png" />';
-        
-        if (miTurno){
-            mnu_botones = mnu_botones + '<img id="btn_juego_adivinar" src="img/ju_btn_adivinar.png" onclick="adivinar();"/><img id="btn_juego_preguntar" src="img/ju_btn_preguntar.png" onclick="preguntar();"/>';
+        if (miTurno && miTarjeta !== null) {
+            mnu_botones += '<img id="btn_juego_adivinar" src="img/ju_btn_adivinar.png" onclick="adivinar();"/><img id="btn_juego_preguntar" src="img/ju_btn_preguntar.png" onclick="preguntar();"/>';
+        } else if (miTurno) {
+            mnu_botones += '<img id="btn_juego_continuar" src="img/btn_continuar.png" onclick="aceptarPartida();"/>';
         }
-        
-        mnu_botones = mnu_botones + '<img id="btn_juego_salir" src="img/btn_salir.png" onclick="inicio();" />';
-        
+        mnu_botones += '<img id="btn_juego_salir" src="img/btn_salir.png" onclick="inicio();" />';
         $('#mnu_botones').html(mnu_botones);
-        
     }
     
     function muestraTablero() {
-        var cuadro_negro = '';
+        var tablero = xml.find('tablero');
+        var cartas = new Array();
+        var posicion = -1;
         for (var i = 0; i < 20; i++) {
             var carta = xml.find('carta[posicion=' + i + ']');
-            var estatusCarta = carta.find('estatusJugador' + noJugador).text();
-            var clasesCarta = 'panel ';
+            if (miTarjeta == carta.attr('id')) {
+            	posicion = i;
+            }
             
+            var clasesCarta = 'panel ';
             if (miTurno) {
                 clasesCarta = clasesCarta + 'click ';
             }
+            var estatusCarta = carta.find('estatusJugador' + noJugador).text();
             switch(estatusCarta) {
                 case 'cerrado':
-                    clasesCarta = clasesCarta + 'flip';
+                    clasesCarta = clasesCarta + 'flip ';
                     break;
                 case 'bloqueado':
                     break;
@@ -74,79 +79,86 @@
                     break;
             }
             
-            var objeto = {}
-            objeto.id = carta.attr('id');
-            objeto.description = carta.attr('description');
-            objeto.url = carta.attr('url');
-            cuadro_negro += obtieneCarta(objeto, i, '', clasesCarta);
+            var objeto = {
+            	id : carta.attr('id'),
+            	description : carta.attr('nombre'),
+            	url : decodeURIComponent(carta.attr('ruta')),
+            	template_id : tablero.attr('tipo'),
+            	clases : clasesCarta
+            };
+            cartas.push(objeto);
+        }
+        
+        var cuadro_negro = '';
+        for (var i = 0; i < cartas.length; i++) {
+			var funcion = '';
+			if (posicion == -1) {
+				funcion = 'seleccionarPersonaje(' + i + ')';
+			}
+			cuadro_negro += obtieneCarta(cartas[i], i, funcion, cartas[i].clases);
         }
         
         $('#cuadro_negro').html(cuadro_negro);
+        if (posicion >= 0) {
+        	seleccionarPersonaje(posicion);
+        } else {
+        	$('#mnu_carta').html('<img class="instruccion" src="img/nu_selecciona_oponente.png"/>');
+        }
         loaderCartas();
+        $('#loading').hide();
     }
     
     function muestraMensajeInicial() {
         if (miTurno) {
-            if(backend_accion_oponente == 'pregunta'){
-                alert(backend_accion_oponente_data,
+            if (ultimaAccion == ACCION_NUEVO) {
+            	alert('Es tu turno de preguntar o adivinar.');
+            } else if (ultimaAccion == ACCION_PREGUNTA) {
+                alert('PREGUNTA',
                       ALERTA_SI_NO,
                       {
                       'btn_si' : cancela,
                       'btn_no' : cancela
                       });
-            } else {
-                alert(backend_accion_oponente_data,
-                      ALERTA_OK,
-                      {
-                      'btn_continuar' : cancela
-                      });
+            } else if (ultimaAccion == ACCION_ADIVINA) {
+                alert('Tu oponente intentó adivinar pero no adivinó tu personaje.');
             }
-            
         } else {
-            alert('Actualmente es el turno de tu oponente',
-                  ALERTA_OK,
-                  {
-                  'btn_continuar' : cancela
-                  });
+            alert('Actualmente es el turno de tu oponente');
         }
     }
     
     function seleccionarAccionClick(accion) {
-        audioCardFlip = createAudio('card_flip');
-        
-        if(accion == 'seleccion'){
-            
-            $('.click').unbind('click');
-            $('.click').click(function(){
-                              audioCardFlip.play();
-                              alert($(this).attr('posicion'));
-                        });
-            
-        } else if(accion == 'flip'){
-            
-            $('.click').unbind('click');
-            $('.click').click(function(){
-                              audioCardFlip.play();
-                              
-                              var posicion = $(this).attr('posicion');
-                              var carta = xml.find('carta[posicion=' + posicion + ']');
-                              var estatusCarta = carta.find('estatusJugador' + noJugador).text();
-                              
-                              if(estatusCarta == 'abierto') {
-                                    carta.find('estatusJugador' + noJugador).text('cerrado');
-                              } else if(estatusCarta == 'cerrado'){
-                                    carta.find('estatusJugador' + noJugador).text('abierto');
-                              }
-                              
-                              if($(this).hasClass('flip')) {
-                                $(this).removeClass('flip');
-                              } else {
-                                $(this).addClass('flip');
-                              }
-                        });
-        }
+    	if (accion == 'seleccion') {
+    		$('.click').unbind('click');
+    		$('.click').click(
+    			function() {
+    				playAudio('flip');
+    				alert($(this).attr('posicion'));
+    			});
+    	} else if (accion == 'flip') {
+    		$('.click').unbind('click');
+    		$('.click').click(
+    			function() {
+    				playAudio('flip');
+    				
+    				var posicion = $(this).attr('posicion');
+    				var carta = xml.find('carta[posicion=' + posicion + ']');
+    				var estatusCarta = carta.find('estatusJugador' + noJugador).text();
+    				
+    				if (estatusCarta == 'abierto') {
+    					carta.find('estatusJugador' + noJugador).text('cerrado');
+    				} else if(estatusCarta == 'cerrado') {
+    					carta.find('estatusJugador' + noJugador).text('abierto');
+    				}
+    				
+    				if ($(this).hasClass('flip')) {
+    					$(this).removeClass('flip');
+    				} else {
+    					$(this).addClass('flip');
+    				}
+    			});
+    	}
     }
-    
     
     function adivinar(){
         seleccionarAccionClick('seleccion');
@@ -168,19 +180,67 @@
               });
 	}
     
-    function enviaTablero(){
+    function enviaTablero() {
         navigator.notification.alert('Estoy enviando el tablero: ' + (new XMLSerializer()).serializeToString(xmlDoc));
     }
 	
 	function cancela() {
         
 	}
+	
+	
+	/* Funciones para aceptar un juego */
+	var posicionSeleccionada = null;
+	
+	function seleccionarPersonaje(posicion) {
+        if (posicionSeleccionada != null) {
+        	$('.cartaTablero[posicion="' + posicionSeleccionada + '"]').removeClass('cartaSeleccionada');
+        }
+        $('.cartaTablero[posicion="' + posicion + '"]').addClass('cartaSeleccionada');
+        
+        posicionSeleccionada = posicion;
+        
+        $('#mnu_carta').addClass('marco_carta');
+        $('#mnu_carta').html('<div id="carta_seleccionada" class="carta"></div>');
+        $('#carta_seleccionada').html($('.cartaTablero[posicion="' + posicion + '"]').html());
+        
+        miTarjeta = $('.cartaTablero[posicion="' + posicion + '"]').attr('id');
+    }
     
+    function aceptarPartida() {
+    	if (posicionSeleccionada != null) {
+			var params = {
+				id : juego.id,
+				card_id : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id'),
+				card_name : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').find('.nombre').attr('nombre'),
+				card_type : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo'),
+				card_facebook_id : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id')
+			};
+			aceptarJuego(params,
+				function(response, textStatus, jqXHR) {
+					if (response && response.id && response.id > 0) {
+						muestraBotones();
+						alert('Tu carta ha sido guardada y ahora es tu turno de preguntar o adivinar.');
+					} else {
+						alert('Tu partida no se pudo guardar correctamente. Favor de intentar nuevamente.');
+					}
+				},
+				function(jqXHR, textStatus, errorThrown) {
+					alert('Tu partida no se pudo guardar correctamente. Favor de intentar nuevamente.');
+				});
+    	} else {
+            alert('Debes seleccionar tu carta para continuar.');
+        }
+    }
 </script>
 <div id="juego">
 	<div class="izquierda">
 		<div id="menu">
-            <div id="mnu_carta"></div>
+			<div id="mnu_carta"></div>
+            <div id="mnu_preguntas">
+            	<img id="fondo_preguntas" src="img/ju_preguntas.png" />
+            	<div id="total_preguntas"></div>
+            </div>
             <div id="mnu_botones">
 			</div>
 		</div>

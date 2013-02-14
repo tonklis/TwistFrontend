@@ -55,6 +55,13 @@ body {
     text-align: center;
 }
 
+// Forzar la carga de imágenes
+body:after {
+	content: url('../img/fondo.png') url('../img/cargando.png') url('../img/loading_150.gif') url('../img/loading_250.gif') url('../img/logo.png');
+	
+	display: none;
+}
+
 /** Login **/
 #loader {
 	position: fixed;
@@ -174,6 +181,17 @@ body {
 	z-index: 1000;
 }
 
+.loading_250 {
+	position: absolute;
+	
+	width: 14%;
+	
+	left: 43%;
+	top: 40%;
+	
+	z-index: 1001;
+}
+
 .alerta {
 	display: none;
 	position: absolute;
@@ -244,7 +262,7 @@ body {
 	top: 10%;
 	left: 13%;
 	
-	z-index: 20;
+	z-index: 10;
 }
 .carta .thumb {
 	position: absolute;
@@ -301,7 +319,7 @@ body {
 	
 	width: 74%;
 	
-	top: 10%;
+	top: 13%;
 	left: 13%;
 	
 	z-index: 15;
@@ -374,10 +392,10 @@ body {
 .partida .estado {
 	position: absolute;
 	
-	width: 79%;
+	width: 77%;
 	height: 100%;
 	
-	right: 0.5%;
+	right: 1.5%;
 	
 	text-align: left;
 }
@@ -422,7 +440,7 @@ body {
 
 .partida .tu_turno {
 	background: transparent url('../img/db_estado_tu_turno.png') no-repeat top left;
-    background-size: cover;
+    background-size: contain;
     
     -moz-text-shadow:    0.1em 0.1em 0.1em #009D44;
 	-webkit-text-shadow: 0.1em 0.1em 0.1em #009D44;
@@ -431,7 +449,7 @@ body {
 
 .partida .su_turno {
 	background: transparent url('../img/db_estado_su_turno.png') no-repeat top left;
-    background-size: cover;
+    background-size: contain;
     
     -moz-text-shadow:    0.1em 0.1em 0.1em #006DB1;
 	-webkit-text-shadow: 0.1em 0.1em 0.1em #006DB1;
@@ -440,7 +458,7 @@ body {
 
 .partida .abandono {
 	background: transparent url('../img/db_estado_abandono.png') no-repeat top left;
-    background-size: cover;
+    background-size: contain;
     
     -moz-text-shadow:    0.1em 0.1em 0.1em #E7AF42;
 	-webkit-text-shadow: 0.1em 0.1em 0.1em #E7AF42;
@@ -508,6 +526,36 @@ body {
 	top: 6%;
 }
 
+/** JUEGO **/
+#mnu_preguntas {
+	position: absolute;
+	
+	width: 100%;
+	top: 45%;
+	
+	font-family: gotham-bold;
+}
+
+#mnu_preguntas #fondo_preguntas {
+	position: absolute;
+	
+	width: 80%;
+	
+	right: 10%;
+	top: 0;
+}
+
+#mnu_preguntas #total_preguntas {
+	position: absolute;
+	
+	width: 100%;
+	
+	right: 0;
+	top: 1.5em;
+	
+	text-align: center;
+}
+
 /** FLIP CARDS **/
 .panel {
 	background: transparent !important;
@@ -568,8 +616,7 @@ body {
 	right: 0;
 	z-index: 800;
 	
-	border: 1px solid #ccc;
-	background: #333;
+	background: #FF0017;
 	text-shadow: 1px  1px 1px rgba(0,0,0,0.6);
 	
 	-moz-border-radius: 5%;
@@ -593,7 +640,7 @@ body {
 
 .panel.flip .back {
 	z-index: 1000;
-	background: #80868d;
+	background: #FF0017;
 	
 	-webkit-transform: rotateX(0deg) rotateY(0deg);
 	-moz-transform: rotateX(0deg) rotateY(0deg);
