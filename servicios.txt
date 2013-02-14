@@ -66,12 +66,12 @@ Params:
 Regresa:
 	El game actualizado como objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
 
-- Obten último turno
+- Obten el último turno
 http://localhost:3000/games/last_turn/ID.json
 Params:
-	ID = el id del game
+	ID = el id del game del oponente (la propiedad opponent_game de un objeto game) (int)
 Regresa:
-	El último turno jugado como objeto de JSON	{"answer":false,"created_at":"2013-02-14T08:39:09Z","game_id":39,"id":3,"is_guess":false,"question":"es blanco?","updated_at":"2013-02-14T08:43:41Z"}
+	El último turno jugado del oponente como objeto de JSON	{"answer":false,"created_at":"2013-02-14T08:39:09Z","game_id":39,"id":3,"is_guess":false,"question":"es blanco?","updated_at":"2013-02-14T08:43:41Z"}
 
 - Preguntar
 http://still-eyrie-7957.herokuapp.com/games/ask/ID.json
