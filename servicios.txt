@@ -30,7 +30,7 @@ http://still-eyrie-7957.herokuapp.com/games_by_user/ID.json
 Params:
 	ID = el id de usuario
 Regresa:
-	los juegos de un usuario, con el tablero y los usuarios donde ID = id de usuario
+	los games de un usuario, con el board y los usuarios que estan jugando
 Respuesta: 
 	(cada game tiene una referencia a un objeto board, a un objeto user, a un objeto opponent_game. El opponent_game a su vez tiene un objeto user que es el del oponente)	[{"board_id":1,"card_id":10,"created_at":"2013-02-08T06:25:46Z","guess_count":0,"id":1,"opponent_game_id":2,"question_count":0,"updated_at":"2013-02-08T06:26:14Z","user_id":1,"board":{"created_at":"2013-02-08T06:25:21Z","detail_xml":"","id":1,"money_awarded":null,"status":"Mi Turno","updated_at":"2013-02-08T06:25:21Z","winner_id":null},"user":{"created_at":"2013-02-08T04:03:00Z","email":"tonklis@gmail.com","facebook_id":null,"first_name":null,"id":1,"last_name":null,"money":null,"updated_at":"2013-02-08T04:21:48Z"},"opponent_game":{"board_id":1,"card_id":12,"created_at":"2013-02-08T06:26:04Z","guess_count":0,"id":2,"opponent_game_id":1,"question_count":0,"updated_at":"2013-02-08T06:26:04Z","user_id":2,"user":{"created_at":"2013-02-08T06:24:08Z","email":"dmiramon@gmail.com","facebook_id":null,"first_name":null,"id":2,"last_name":null,"money":null,"updated_at":"2013-02-08T06:24:08Z"}}}]
 
@@ -44,24 +44,66 @@ Regresa:
 - Crea juego
 http://still-eyrie-7957.herokuapp.com/games/start.json
 Params:
-	user_id = El id del usuario creando el juego
-	detail_xml = El xml del tablero (como string)
-	card_id = El id de la tarjeta seleccionada (si se conoce)
-	card_type = El tipo de tarjeta (1 = Famosos, 2 = Personajes, 3 = Amigo Facebook")
-	card_facebook_id = El id de facebook del amigo seleccionado como tarjeta (solo si el card_type = 3)
-	card_name = El nombre del amigo seleccionado como tarjeta (solo si el card_type = 3)
+	user_id = El id del usuario creando el juego (int)
+	detail_xml = El xml del tablero (string)
+	card_id = El id de la tarjeta seleccionada (si se conoce) (int)
+	card_type = El tipo de tarjeta (1 = Famosos, 2 = Personajes, 3 = Amigo Facebook") (int)
+	card_facebook_id = El id de facebook del amigo seleccionado como tarjeta (solo si el card_type = 3) (string)
+	card_name = El nombre del amigo seleccionado como tarjeta (solo si el card_type = 3) (string)
 	opponent_id = El facebook_id del oponente (string)
-	opponent_name = El first name del oponente
+	opponent_name = El first name del oponente (string)
 Regresa:
-	El juego creado como un objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
+	El game creado como un objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
 	
 - Acepta juego
 http://still-eyrie-7957.herokuapp.com/games/start/ID.json
 Params:
-	ID(en el url) = El id del juego
-	card_id = El id de la tarjeta seleccionada (si se conoce)
-	card_type = El tipo de tarjeta (1 = Famosos, 2 = Personajes, 3 = Amigo Facebook")
-	card_facebook_id = El id de facebook del amigo seleccionado como tarjeta (solo si el card_type = 3)
-	card_name = El nombre del amigo seleccionado como tarjeta (solo si el card_type = 3)
+	ID(en el url) = El id del game
+	card_id = El id de la tarjeta seleccionada (si se conoce) (int)
+	card_type = El tipo de tarjeta (1 = Famosos, 2 = Personajes, 3 = Amigo Facebook") (int)
+	card_facebook_id = El id de facebook del amigo seleccionado como tarjeta (solo si el card_type = 3) (string)
+	card_name = El nombre del amigo seleccionado como tarjeta (solo si el card_type = 3) (string)
 Regresa:
-	El juego actualizado como objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
+	El game actualizado como objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
+
+- Obten último turno
+http://localhost:3000/games/last_turn/ID.json
+Params:
+	ID = el id del game
+Regresa:
+	El último turno jugado como objeto de JSON	{"answer":false,"created_at":"2013-02-14T08:39:09Z","game_id":39,"id":3,"is_guess":false,"question":"es blanco?","updated_at":"2013-02-14T08:43:41Z"}
+
+- Preguntar
+http://still-eyrie-7957.herokuapp.com/games/ask/ID.json
+Params:
+	ID (en el url) = el id del game
+	detail_xml = el xml del tablero (string)
+	answer = la respuesta a la pregunta anterior del contrincante. true para sí y false para no (boolean)
+	question = la pregunta que se hace al contrincante (string)
+Regresa:
+	El game actualizado con su board como objetos de JSON
+	
+- Adivinar
+http://still-eyrie-7957.herokuapp.com/games/guess/ID.json
+Params:
+	ID (en el url) = el id del game
+	detail_xml = el xml del tablero (string)
+	answer = la respuesta a la pregunta anterior del contrincante. true para sí y false para no (boolean)
+	card_id = el id de la tarjeta que se seleccionó (int)
+Regresa:
+	El game actualizado con su board como objetos de JSON
+	
+- Abandonar juego
+http://still-eyrie-7957.herokuapp.com/boards/abandon/ID.json
+Params:
+	ID (en el url) = el id del board
+	user_id = el id del usuario que abandona el juego (int)
+Regresa:
+	El board actualizado como un objeto de JSON
+	
+- Cerrar juego
+http://still-eyrie-7957.herokuapp.com/boards/close/ID.json
+Params:
+	ID (en el url) = el id del board
+Regresa:
+	El board actualizado como un objeto de JSON
