@@ -1,69 +1,98 @@
 <script>
 	// Javascript que se ejecute al iniciar la página.
+	$('#loading').show();
+	
 	var usuario = getCache('usuario');
 	$('#total_monedas').html(usuario.money);
 	
 	obtenerJuegosPorUsuario({ id : usuario.id },
 		function(response, textStatus, jqXHR) {
+			$('#cuadro_negro').html('');
 			for (var i = 0; i < response.length; i++) {
 				agregarJuego(response[i]);
 			}
 			setCache('partidas', response);
+			$('#loading').hide();
 		},
 		function(jqXHR, textStatus, errorThrown) {
 			alert('No se pudieron obtener los juegos actuales. Por favor intenta mas tarde.');
+			$('#loading').hide();
 		});
 	
 	function agregarJuego(juego) {
 		var $div = $("<div class='partida'/>");
 		$div.load('dashboard_partida.html',
 			function(response) {
-				$div.find('.thumb').attr('src', "http://graph.facebook.com/" + juego.opponent_game.user.facebook_id + "/picture?width=250&height=250");
-				$div.find('.nombre').html(juego.opponent_game.user.first_name);
-				
-				switch(juego.board.status) {
-					case 'Mi Turno':
-						$div.find('.mensaje').html('¡ES TU TURNO!');
-						$div.find('.estado').addClass('tu_turno');
-						break;
-					case 'Su Turno':
-						$div.find('.mensaje').html('Es su turno');
-						$div.find('.estado').addClass('su_turno');
-						break;
-					case 'Abandono':
-						$div.find('.mensaje').html('Abandonó');
-						$div.find('.estado').addClass('abandono');
-						break;
-				}
-				var ultimoMovimiento = new Date(juego.updated_at);
-				var hoy = new Date();
-				var diff = (hoy - ultimoMovimiento);
-				
-				var dias = diff / (24 * 60 * 60 * 1000);
-				var horas = diff / (60 * 60 * 1000);
-				
-				if (dias >= 1) {
-					$div.find('.actualizacion').html('Hace ' + Math.floor(dias) + ' días');
-				} else {
-					$div.find('.actualizacion').html('Hace ' + Math.floor(horas) + ' horas');
+				var estatus = juego.board.status;
+				var visible = true;
+				if (juego.board.status == 'NUEVO'
+						|| juego.board.status == 'TURNO') {
+					if (juego.board.last_action == usuario.id) {
+						estatus = 'SU_TURNO';
+					} else {
+						estatus = 'TU_TURNO';
+					}
+				} else if (juego.board.status == 'ABANDONO') {
+					if (juego.board.last_action == usuario.id) {
+						visible = false;
+					}
+				} else if (juego.board.status == 'TERMINO') {
+					if (juego.board.last_action == usuario.id) {
+						visible = false;
+					}
 				}
 				
-				// Se inicializan los clicks.
-				$div.click(function(event) {
-					setCache('juego', juego);
-					abrirTemplate('juego.html');
-				});
-				$div.find('.btn_borrar').click(function(event) {
-					confirmacion(juego.id);
-					event.stopImmediatePropagation();
-				});
-				
-				// Se agrega el div a la lista y se activa el evento de swipeleft.
-				$('#cuadro_negro').append($div);
-				$(".estado").swipeleft(function(event) {
-					$('.botones').hide();
-					$(event.target).children('.botones').show();
-				});
+				if (visible) {
+					$div.find('.thumb').attr('src', "http://graph.facebook.com/" + juego.opponent_game.user.facebook_id + "/picture?width=250&height=250");
+					$div.find('.nombre').html(juego.opponent_game.user.first_name);
+					
+					switch(estatus) {
+						case 'TU_TURNO':
+							$div.find('.mensaje').html('¡ES TU TURNO!');
+							$div.find('.estado').addClass('tu_turno');
+							break;
+						case 'SU_TURNO':
+							$div.find('.mensaje').html('Es su turno');
+							$div.find('.estado').addClass('su_turno');
+							break;
+						case 'ABANDONO':
+							$div.find('.mensaje').html('Abandonó');
+							$div.find('.estado').addClass('abandono');
+							break;
+						case 'TERMINO':
+							$div.find('.mensaje').html('Terminó');
+							$div.find('.estado').addClass('abandono');
+							break;
+					}
+					
+					var ultimoMovimiento = new Date(juego.updated_at);
+					var hoy = new Date();
+					var diff = (hoy - ultimoMovimiento);
+					var dias = diff / (24 * 60 * 60 * 1000);
+					var horas = diff / (60 * 60 * 1000);
+					if (dias >= 1) {
+						$div.find('.actualizacion').html('Hace ' + Math.floor(dias) + ' días');
+					} else {
+						$div.find('.actualizacion').html('Hace ' + Math.floor(horas) + ' horas');
+					}
+					
+					// Se inicializan los clicks.
+					$div.click(function(event) {
+						setCache('juego', juego);
+						abrirTemplate('juego.html');
+					});
+					$div.find('.btn_borrar').click(function(event) {
+						confirmacion(juego.id);
+						event.stopImmediatePropagation();
+					});
+					
+					// Se agrega el div a la lista y se activa el evento de swipeleft.
+					$('#cuadro_negro').append($div);
+					$(".estado").swipeleft(function(event) {
+						$('.botones').hide();
+						$(event.target).children('.botones').show();
+					});
+				}
 			});
 	}
 	
@@ -78,11 +107,9 @@
 	}
 	
 	function cancela() {
-
 	}
 	
 	function confirma() {
-
 	}
 </script>
 <div id="dashboard">
@@ -100,17 +127,6 @@
 	</div>
 	<div class="derecha">
 		<div id="cuadro_negro">
-			<!-- div class="partida" onclick="abrirTemplate('juego.html');">
-				<div class="carta jugador">
-					<img class="thumb" src="http://profile.ak.fbcdn.net/hprofile-ak-ash3/48820_574865437_6679246_q.jpg"/>
-					<span class="nombre">JugadorA</span>
-				</div>
-				<div class="estado tu_turno">
-					<span class="mensaje">¡ES TU TURNO!</span>
-					<span class="actualizacion">Hace N días</span>
-					<div class="botones" onclick="confirmacion(1)">Borrar</div>
-				</div>
-			</div -->
 		</div>
 	</div>
 </div>
