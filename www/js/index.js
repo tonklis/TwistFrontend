@@ -29,16 +29,14 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('resume', this.onResume, false);
-        document.addEventListener('push-notification', function(event) {
-                                  // handle push notifications insie the app
-                                  console.log("push-notification");
-                                  });
+        document.addEventListener('push-notification', this.receiveEvent, false);
+    },
+    receiveEvent: function(event){
+        // handle push notifications inside the app
     },
     onResume: function() {
-        app.myLog.value="";
-        // Clear the badge number - if a new notification is received it will have a number set on it for   the badge
         app.setBadges(0);
-        app.getPending(); // Get pending since we were reopened and may have been launched from a push notification
+        app.getPending();
     },
     getBadges: function() {
         pushNotification.getApplicationIconBadgeNumber(function(badgeNumber) {
@@ -57,8 +55,7 @@ var app = {
     },
     getPending: function() {
         pushNotification.getPendingNotifications(function(notifications) {
-                                                 app.myLog.value+=JSON.stringify(['getPendingNotifications', notifications])+"\n";
-                                                 console.log(JSON.stringify(['getPendingNotifications', notifications]));
+                                                 //console.info("NOTIFICATIONS " + notifications.notifications.length);
                                                  });
     },
     register: function() {
@@ -71,9 +68,9 @@ var app = {
                                         app.linkDevice(status.deviceToken, getCache('usuario').facebook_id);
                                         });
     },
-    sendNotification: function(token, message, sound, badge) {
+    sendNotification: function(game_id, message, sound) {
         var xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("POST","http://"+URL+"/ios_send_notification.json",true);
+        xmlhttp.open("POST","http://"+URL+"/ios_send_notification_to_opponent.json",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         xmlhttp.send("token="+token+"&message="+message+"&sound="+sound+"&badge="+badge);
         xmlhttp.onreadystatechange=function() {
@@ -187,7 +184,7 @@ function init() {
 									function (response, textStatus, jqXHR) {
 										setCache('usuario', response);
 										iniciarProceso();
-                                             console.info(" FB ID " + getCache('usuario').facebook_id);
+                                        app.registerWithFacebook();
 									},
 									function(jqXHR, textStatus, errorThrown) {
 										alert('No pudimos conectarnos con el servidor de Adivina-Me, vuelve a intentarlo mas tarde.');

@@ -1,9 +1,9 @@
+<script type="text/javascript" src="plugins/PushNotification.js"></script>
 <script>
 	// Javascript que se ejecute al iniciar la página.
 	$('#loading').show();
 	
 	var usuario = getCache('usuario');
-    console.info(" FB ID LOGGED IN" + getCache('usuario').facebook_id);
 	$('#total_monedas').html(usuario.money);
 	
 	obtenerJuegosPorUsuario({ id : usuario.id },
