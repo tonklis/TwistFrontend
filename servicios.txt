@@ -55,8 +55,11 @@ Params:
 Regresa:
 	El game creado como un objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
 	
+	Un objeto error si ya existe un juego nuevo entre los 2 jugadores
+	{"error":"There is already an active game"}
+	
 - Acepta juego
-http://still-eyrie-7957.herokuapp.com/games/start/ID.json
+http://still-eyrie-7957.herokuapp.com/games/accept/ID.json
 Params:
 	ID(en el url) = El id del game
 	card_id = El id de la tarjeta seleccionada (si se conoce) (int)
@@ -94,6 +97,7 @@ Regresa:
 	El game actualizado con su board como objetos de JSON
 	
 - Abandonar juego
+Si el juego esta FINALIZADO, lo oculta para el usuario
 http://still-eyrie-7957.herokuapp.com/boards/abandon/ID.json
 Params:
 	ID (en el url) = el id del board
