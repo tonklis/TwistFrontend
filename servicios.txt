@@ -97,6 +97,7 @@ Regresa:
 	El game actualizado con su board como objetos de JSON
 	
 - Abandonar juego
+Si el juego esta FINALIZADO, lo oculta para el usuario
 http://still-eyrie-7957.herokuapp.com/boards/abandon/ID.json
 Params:
 	ID (en el url) = el id del board
