@@ -55,6 +55,9 @@ Params:
 Regresa:
 	El game creado como un objeto de JSON	{"board_id":11,"card_id":5,"created_at":"2013-02-12T21:49:07Z","guess_count":0,"id":15,"opponent_game_id":16,"question_count":0,"updated_at":"2013-02-12T21:49:07Z","user_id":1}
 	
+	Un objeto error si ya existe un juego nuevo entre los 2 jugadores
+	{"error":"There is already an active game"}
+	
 - Acepta juego
 http://still-eyrie-7957.herokuapp.com/games/accept/ID.json
 Params:
