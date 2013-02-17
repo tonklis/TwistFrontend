@@ -20,20 +20,89 @@ var app = {
     // Application Constructor
     initialize: function() {
         this.bindEvents();
+        this.register();
+        this.getBadges();
     },
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
+        document.addEventListener('resume', this.onResume, false);
+        document.addEventListener('push-notification', function(event) {
+                                  // handle push notifications insie the app
+                                  console.log("push-notification");
+                                  });
     },
-    // deviceready Event Handler
-    //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicity call 'app.receivedEvent(...);'
-    onDeviceReady: function() {
-        app.receivedEvent('deviceready');
+    onResume: function() {
+        app.myLog.value="";
+        // Clear the badge number - if a new notification is received it will have a number set on it for   the badge
+        app.setBadges(0);
+        app.getPending(); // Get pending since we were reopened and may have been launched from a push notification
+    },
+    getBadges: function() {
+        pushNotification.getApplicationIconBadgeNumber(function(badgeNumber) {
+                                                       badgesNumber = badgeNumber;
+                                                       });
+
+    },
+    setBadges: function(num) {
+        pushNotification.setApplicationIconBadgeNumber(num);
+        badgesNumber = num;
+    },
+    receiveStatus: function() {
+        pushNotification.getRemoteNotificationStatus(function(status) {
+                                                     app.myLog.value+=JSON.stringify(['Registration check - getRemoteNotificationStatus', status])+"\n";
+                                                     });
+    },
+    getPending: function() {
+        pushNotification.getPendingNotifications(function(notifications) {
+                                                 app.myLog.value+=JSON.stringify(['getPendingNotifications', notifications])+"\n";
+                                                 console.log(JSON.stringify(['getPendingNotifications', notifications]));
+                                                 });
+    },
+    register: function() {
+        pushNotification.registerDevice({alert:true, badge:true, sound:true}, function(status) {
+                                            app.storeToken(status.deviceToken);
+                                        });
+    },
+    registerWithFacebook: function() {
+        pushNotification.registerDevice({alert:true, badge:true, sound:true}, function(status) {
+                                        app.linkDevice(status.deviceToken, getCache('usuario').facebook_id);
+                                        });
+    },
+    sendNotification: function(token, message, sound, badge) {
+        var xmlhttp=new XMLHttpRequest();
+        xmlhttp.open("POST","http://"+URL+"/ios_send_notification.json",true);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send("token="+token+"&message="+message+"&sound="+sound+"&badge="+badge);
+        xmlhttp.onreadystatechange=function() {
+            if (xmlhttp.readyState==4) {
+                console.log("Registration response: " + xmlhttp.responseText);
+            }
+        }
+    },
+    storeToken: function(token) {
+        var xmlhttp=new XMLHttpRequest();
+        xmlhttp.open("POST","http://"+URL+"/ios_register.json",true);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send("token="+token);
+        xmlhttp.onreadystatechange=function() {
+            if (xmlhttp.readyState==4) {
+                console.log("Registration response: " + xmlhttp.responseText);
+            }
+        }
+    },
+    linkDevice: function(token, facebook_id) {
+        var xmlhttp=new XMLHttpRequest();
+        xmlhttp.open("POST","http://"+URL+"/ios_register.json",true);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send("token="+token+"&facebook_id="+facebook_id);
+        xmlhttp.onreadystatechange=function() {
+            if (xmlhttp.readyState==4) {
+                console.log("Registration response: " + xmlhttp.responseText);
+            }
+        }
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -54,6 +123,9 @@ var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
 var templateDashboard = "dashboard.html";
 
+//var URL = "192.168.1.225:3000";
+var URL = "still-eyrie-7957.herokuapp.com";
+
 var appId = "336541486458847";
 var sistemaOperativo = "iOS"; //iOS
 // var sistemaOperativo = "iOS"; //Android
@@ -67,9 +139,18 @@ var ACCION_NUEVO = 2;
 var ACCION_PREGUNTA = 3;
 var ACCION_ADIVINA = 4;
 
+var pushNotification;
+var badgesNumber;
+
 /** Inicializa listeners para eventos **/
 document.addEventListener("offline", redirigirSinConexion, false);
-document.addEventListener("deviceready", init, false);
+document.addEventListener("deviceready", registerNotifications, false);
+
+function registerNotifications(){
+    pushNotification = window.plugins.pushNotification;
+    app.initialize();
+    init();
+}
 
 /** Función que mustra la página sin conexión. **/
 function redirigirSinConexion() {
@@ -106,6 +187,7 @@ function init() {
 									function (response, textStatus, jqXHR) {
 										setCache('usuario', response);
 										iniciarProceso();
+                                             console.info(" FB ID " + getCache('usuario').facebook_id);
 									},
 									function(jqXHR, textStatus, errorThrown) {
 										alert('No pudimos conectarnos con el servidor de Adivina-Me, vuelve a intentarlo mas tarde.');
