@@ -11,6 +11,14 @@
 		<img class="btn_no" src="img/btn_no.png" onclick="ejecutaFuncion('btn_no')" />
 	</div>
 </div>
+<div class="alerta" tipo="PREGUNTA">
+	<div class="alerta_imagen"></div>
+	<div class="alerta_mensaje"></div>
+	<div class="alerta_botones">
+		<img class="btn_si" src="img/btn_si.png" onclick="ejecutaFuncion('btn_si')" />
+		<img class="btn_no" src="img/btn_no.png" onclick="ejecutaFuncion('btn_no')" />
+	</div>
+</div>
 <div class="alerta" tipo="NUEVO_JUEGO">
 	<div class="alerta_mensaje"></div>
 	<div class="alerta_botones">
@@ -20,8 +28,9 @@
 </div>
 <div class="alerta" tipo="INPUT">
 	<div class="alerta_mensaje"></div>
-	<div class="alerta_inputs"><input id="alerta_input" type="text"/></div>
+	<div class="alerta_inputs"><textarea id="alerta_input" onkeypress='$("body").css("height", "+=1").css("height", "-=1");' maxlength="150" cols="40" rows="2"/></div>
 	<div class="alerta_botones">
 		<img class="btn_enviar" src="img/btn_enviar.png" onclick="ejecutaFuncion('btn_enviar')" />
+		<img class="btn_cancelar" src="img/btn_salir.png" onclick="ejecutaFuncion('btn_cancelar')" />
 	</div>
 </div>

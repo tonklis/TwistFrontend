@@ -6,6 +6,11 @@ var SERVICIO_CARTAS = 4;
 var SERVICIO_AMIGOS_JUGANDO = 5;
 var SERVICIO_CREAR_JUEGO = 6;
 var SERVICIO_ACEPTAR_JUEGO = 7;
+var SERVICIO_OBTENER_TURNO = 8;
+var SERVICIO_PREGUNTAR = 9;
+var SERVICIO_ADIVINAR = 10;
+var SERVICIO_ABANDONAR = 11;
+var SERVICIO_CERRAR = 12;
 
 /**
  * Función que invoca los servicios del servidor.
@@ -66,6 +71,41 @@ function invocarServicio(tipo, params, funcionSuccess, funcionError) {
 		case SERVICIO_ACEPTAR_JUEGO:
 			if (params.id && params.card_id && params.card_type && params.card_facebook_id && params.card_name) {
 				url += "games/accept/" + params.id + ".json";
+				delete params.id;
+				paramsCompletos = true;
+			}
+			break;
+		case SERVICIO_OBTENER_TURNO:
+			if (params.id) {
+				url += "games/last_turn/" + params.id + ".json";
+				delete params.id;
+				paramsCompletos = true;
+			}
+			break;
+		case SERVICIO_PREGUNTAR:
+			if (params.id && params.detail_xml && params.question) {
+				url += "games/ask/" + params.id + ".json";
+				delete params.id;
+				paramsCompletos = true;
+			}
+			break;
+		case SERVICIO_ADIVINAR:
+			if (params.id && params.detail_xml && params.card_id) {
+				url += "games/guess/" + params.id + ".json";
+				delete params.id;
+				paramsCompletos = true;
+			}
+			break;
+		case SERVICIO_ABANDONAR:
+			if (params.id && params.user_id) {
+				url += "boards/abandon/" + params.id + ".json";
+				delete params.id;
+				paramsCompletos = true;
+			}
+			break;
+		case SERVICIO_CERRAR:
+			if (params.id) {
+				url += "boards/close/" + params.id + ".json";
 				delete params.id;
 				paramsCompletos = true;
 			}
@@ -220,4 +260,76 @@ function crearJuego(params, funcionSuccess, funcionError) {
  **/
 function aceptarJuego(params, funcionSuccess, funcionError) {
 	invocarServicio(SERVICIO_ACEPTAR_JUEGO, params, funcionSuccess, funcionError);
+}
+
+/**
+ * Función para obtener el turno del juego.
+ * @param params es un objeto que debe tener las siguientes propiedades:
+ *   id: El id del juego
+ * @param funcionSuccess función que se invocará cuando se haya realizado una petición
+ *   satisfactoria con los parámetros function(response, textStatus, jqXHR);
+ * @param funcionError función que se invocará cuando se haya realizado una petición
+ *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
+ **/
+function obtenerTurnoJuego(params, funcionSuccess, funcionError) {
+	invocarServicio(SERVICIO_OBTENER_TURNO, params, funcionSuccess, funcionError);
+}
+
+/**
+ * Función para enviar una pregunta al oponente.
+ * @param params es un objeto que debe tener las siguientes propiedades:
+ *   id: El id del juego
+ *   detail_xml: el xml del tablero
+ *   answer: la respuesta a la pregunta anterior del contrincante. true para sí y false para no (boolean)
+ *   question: la pregunta que se hace al contrincante
+ * @param funcionSuccess función que se invocará cuando se haya realizado una petición
+ *   satisfactoria con los parámetros function(response, textStatus, jqXHR);
+ * @param funcionError función que se invocará cuando se haya realizado una petición
+ *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
+ **/
+function preguntarJuego(params, funcionSuccess, funcionError) {
+	invocarServicio(SERVICIO_PREGUNTAR, params, funcionSuccess, funcionError);
+}
+
+/**
+ * Función para adivinar el personaje del oponente.
+ * @param params es un objeto que debe tener las siguientes propiedades:
+ *   id: El id del juego
+ *   detail_xml: el xml del tablero
+ *   answer: la respuesta a la pregunta anterior del contrincante. true para sí y false para no (boolean)
+ *   card_id: el id de la tarjeta que se seleccionó
+ * @param funcionSuccess función que se invocará cuando se haya realizado una petición
+ *   satisfactoria con los parámetros function(response, textStatus, jqXHR);
+ * @param funcionError función que se invocará cuando se haya realizado una petición
+ *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
+ **/
+function adivinarJuego(params, funcionSuccess, funcionError) {
+	invocarServicio(SERVICIO_ADIVINAR, params, funcionSuccess, funcionError);
+}
+
+/**
+ * Función para abandonar el juego por parte de un usuario.
+ * @param params es un objeto que debe tener las siguientes propiedades:
+ *   id: El id del juego
+ *   user_id: el id del usuario que abandona el juego
+ * @param funcionSuccess función que se invocará cuando se haya realizado una petición
+ *   satisfactoria con los parámetros function(response, textStatus, jqXHR);
+ * @param funcionError función que se invocará cuando se haya realizado una petición
+ *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
+ **/
+function abandonarJuego(params, funcionSuccess, funcionError) {
+	invocarServicio(SERVICIO_ABANDONAR, params, funcionSuccess, funcionError);
+}
+
+/**
+ * Función que cierra el juego.
+ * @param params es un objeto que debe tener las siguientes propiedades:
+ *   id: El id del juego
+ * @param funcionSuccess función que se invocará cuando se haya realizado una petición
+ *   satisfactoria con los parámetros function(response, textStatus, jqXHR);
+ * @param funcionError función que se invocará cuando se haya realizado una petición
+ *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
+ **/
+function cerrarJuego(params, funcionSuccess, funcionError) {
+	invocarServicio(SERVICIO_CERRAR, params, funcionSuccess, funcionError);
 }

@@ -19,7 +19,9 @@
 					var partidas = getCache('partidas');
 					for (var i = 0; i < partidas.length; i++) {
 						for (var j = 0; j < amigos.length; j++) {
-							if (partidas[i].opponent_game.user.facebook_id == amigos[j].uid) {
+							if (partidas[i].opponent_game.user.facebook_id == amigos[j].uid
+									&& partidas[i].board.status != ESTATUS_ABANDONO
+									&& partidas[i].board.status != ESTATUS_FINALIZO) {
 								amigos.splice(j, 1);
 								break;
 							}

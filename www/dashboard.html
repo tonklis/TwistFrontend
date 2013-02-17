@@ -1,4 +1,3 @@
-<script type="text/javascript" src="plugins/PushNotification.js"></script>
 <script>
 	// Javascript que se ejecute al iniciar la página.
 	$('#loading').show();
@@ -26,21 +25,19 @@
 			function(response) {
 				var estatus = juego.board.status;
 				var visible = true;
-				if (juego.board.status == 'NUEVO'
-						|| juego.board.status == 'TURNO') {
+				if (juego.board.status == ESTATUS_NUEVO
+						|| juego.board.status == ESTATUS_TURNO) {
 					if (juego.board.last_action == usuario.id) {
-						estatus = 'SU_TURNO';
+						estatus = ESTATUS_SU_TURNO;
 					} else {
-						estatus = 'TU_TURNO';
+						estatus = ESTATUS_TU_TURNO;
 					}
-				} else if (juego.board.status == 'ABANDONO') {
+				} else if (juego.board.status == ESTATUS_ABANDONO) {
 					if (juego.board.last_action == usuario.id) {
 						visible = false;
 					}
-				} else if (juego.board.status == 'TERMINO') {
-					if (juego.board.last_action == usuario.id) {
-						visible = false;
-					}
+				} else if (juego.board.status == ESTATUS_FINALIZO) {
+					// Esperar a variable visible
 				}
 				
 				if (visible) {
@@ -48,21 +45,26 @@
 					$div.find('.nombre').html(juego.opponent_game.user.first_name);
 					
 					switch(estatus) {
-						case 'TU_TURNO':
+						case ESTATUS_TU_TURNO:
 							$div.find('.mensaje').html('¡ES TU TURNO!');
 							$div.find('.estado').addClass('tu_turno');
 							break;
-						case 'SU_TURNO':
+						case ESTATUS_SU_TURNO:
 							$div.find('.mensaje').html('Es su turno');
 							$div.find('.estado').addClass('su_turno');
 							break;
-						case 'ABANDONO':
+						case ESTATUS_ABANDONO:
 							$div.find('.mensaje').html('Abandonó');
 							$div.find('.estado').addClass('abandono');
 							break;
-						case 'TERMINO':
-							$div.find('.mensaje').html('Terminó');
-							$div.find('.estado').addClass('abandono');
+						case ESTATUS_FINALIZO:
+							if (juego.board.winner_id == usuario.id) {
+								$div.find('.mensaje').html('¡Ganaste!');
+								$div.find('.estado').addClass('tu_turno');
+							} else {
+								$div.find('.mensaje').html('¡Perdiste!');
+								$div.find('.estado').addClass('su_turno');
+							}
 							break;
 					}
 					
@@ -78,12 +80,16 @@
 					}
 					
 					// Se inicializan los clicks.
-					$div.click(function(event) {
-						setCache('juego', juego);
-						abrirTemplate('juego.html');
-					});
+                  
+                    if (estatus == ESTATUS_TU_TURNO || estatus == ESTATUS_SU_TURNO || estatus == ESTATUS_FINALIZO) {
+                        $div.click(function(event) {
+                            setCache('juego', juego);
+                            abrirTemplate('juego.html');
+                        });
+                    }
+                  
 					$div.find('.btn_borrar').click(function(event) {
-						confirmacion(juego.id);
+						confirmacion(juego.board);
 						event.stopImmediatePropagation();
 					});
 					
@@ -98,20 +104,51 @@
 	}
 	
 	// Funcionalidad de los botones de borrar
-	function confirmacion(partida) {
+	function confirmacion(board) {
 		alert('¿Deseas abandonar esta partida? Se perderan todos los datos.',
 			 ALERTA_SI_NO,
 			 {
 			 	'btn_no' : cancela,
-			 	'btn_si' : confirma
+              'btn_si' : function () {confirma(board)}
 			 });
 	}
 	
 	function cancela() {
 	}
 	
-	function confirma() {
+	function confirma(board) {
+        
+        if (board.status == ESTATUS_ABANDONO) {
+            cerrarJuego({ id : board.id },
+                function(response, textStatus, jqXHR) {
+                    if(response.id == board.id){
+                        refrescar();
+                    } else {
+                        alert('No se pudo cerrar el juego. Por favor intenta mas tarde.');
+                    }
+                },
+                function(jqXHR, textStatus, errorThrown) {
+                    alert('No se pudo cerrar el juego. Por favor intenta mas tarde.');
+                    $('#loading').hide();
+                });
+            
+        } else {
+            abandonarJuego({ id : board.id, user_id : usuario.id },
+                function(response, textStatus, jqXHR) {
+                    if(response.id == board.id){
+                        inicio();
+                    } else {
+                        alert('No se pudo abandonar el juego. Por favor intenta mas tarde.');
+                    }
+                },
+                function(jqXHR, textStatus, errorThrown) {
+                    alert('No se pudo abandonar el juego. Por favor intenta mas tarde.');
+                    $('#loading').hide();
+                });
+        }
+        
 	}
+    
 </script>
 <div id="dashboard">
 	<div class="izquierda">

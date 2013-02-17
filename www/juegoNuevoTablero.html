@@ -17,7 +17,7 @@
     			obtenerCartasPorId({ 'id' : TIPO_CARTA_PERSONAJE },
     			function(responsePersonajes) {
     				setCache('personajes', responsePersonajes);
-    				generarTablero(tipoTablero);
+    				seleccionarTablero(tipoTablero);
     			}, funcionError);
     		}, funcionError);
     }
@@ -62,7 +62,7 @@
     
     function seleccionarTablero(tipoTablero) {
         if (!tipoTablero) {
-            tipoTablero = 'personajes';
+            tipoTablero = 'amigos';
         }
         generarTablero(tipoTablero)
     }

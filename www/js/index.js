@@ -28,15 +28,19 @@ var app = {
     // Bind any events that are required on startup. Common events are:
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
-        document.addEventListener('resume', this.onResume, false);
+    	document.addEventListener('resume', this.onResume, false);
         document.addEventListener('push-notification', this.receiveEvent, false);
     },
-    receiveEvent: function(event){
+    receiveEvent: function(event) {
         // handle push notifications inside the app
+    	if (paginaActual == templateDashboard) {
+    		inicio();
+    	}
     },
     onResume: function() {
         app.setBadges(0);
         app.getPending();
+        inicio();
     },
     getBadges: function() {
         pushNotification.getApplicationIconBadgeNumber(function(badgeNumber) {
@@ -101,6 +105,13 @@ var app = {
             }
         }
     },
+    // deviceready Event Handler
+    //
+    // The scope of 'this' is the event. In order to call the 'receivedEvent'
+    // function, we must explicity call 'app.receivedEvent(...);'
+    onDeviceReady: function() {
+        app.receivedEvent('deviceready');
+    },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         var parentElement = document.getElementById(id);
@@ -115,6 +126,7 @@ var app = {
 };
 
 /** Variables para Javascript **/
+var paginaActual;
 var paginaIndex = "index.html";
 var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
@@ -132,9 +144,12 @@ var TIPO_CARTA_FAMOSO = 1;
 var TIPO_CARTA_PERSONAJE = 2;
 var TIPO_CARTA_AMIGO = 3;
 
-var ACCION_NUEVO = 2;
-var ACCION_PREGUNTA = 3;
-var ACCION_ADIVINA = 4;
+var ESTATUS_NUEVO = 'NUEVO';
+var ESTATUS_TURNO = 'TURNO';
+var ESTATUS_TU_TURNO = 'TU_TURNO';
+var ESTATUS_SU_TURNO = 'SU_TURNO';
+var ESTATUS_ABANDONO = 'ABANDONO';
+var ESTATUS_FINALIZO = 'FINALIZO';
 
 var pushNotification;
 var badgesNumber;
@@ -184,7 +199,7 @@ function init() {
 									function (response, textStatus, jqXHR) {
 										setCache('usuario', response);
 										iniciarProceso();
-                                        app.registerWithFacebook();
+										app.registerWithFacebook();
 									},
 									function(jqXHR, textStatus, errorThrown) {
 										alert('No pudimos conectarnos con el servidor de Adivina-Me, vuelve a intentarlo mas tarde.');
@@ -308,6 +323,8 @@ function limitaTexto(cadena, longitud) {
 
 var current_template = 0;
 function abrirTemplate(template) {
+	paginaActual = template;
+	
 	playAudio('click');
 	current_template++;
 	var number_template = current_template;
@@ -385,6 +402,7 @@ var funciones;
 
 var ALERTA_OK = 'OK';
 var ALERTA_SI_NO = 'SI_NO';
+var ALERTA_PREGUNTA = 'PREGUNTA';
 var ALERTA_NUEVO_JUEGO = 'NUEVO_JUEGO';
 var ALERTA_INPUT = 'INPUT';
 
@@ -401,8 +419,14 @@ function alert(texto, tipo, acciones) {
 		acciones = new Array();
 	}
 	
+	$('#alerta_input').val('');
+	
 	$('.alerta[tipo="' + tipo + '"]').children('.alerta_mensaje').html(texto);
 	funciones = acciones;
+	
+	if (tipo == ALERTA_PREGUNTA && acciones['imagen']) {
+		$('.alerta[tipo="' + tipo + '"]').children('.alerta_imagen').html(acciones['imagen']);
+	}
 	
 	$('.alerta[tipo="' + tipo + '"]').show();
 	$('#alertas').fadeIn('fast');
@@ -411,16 +435,22 @@ function alert(texto, tipo, acciones) {
 }
 
 function cerrarAlert() {
-	$('#alertas').fadeOut('fast');
-	$('.alerta').hide();
+	$('#alertas').fadeOut('fast', function() {
+		$('.alerta').hide();
+	});
 }
 
 function ejecutaFuncion(nombre) {
 	playAudio('click');
+	cerrarAlert();
+	
+	needsScrollUpdate = true;
+	$("html, body").animate({ scrollTop: 0 }, "fast");
+	needsScrollUpdate = false;
+	
 	if (funciones[nombre]) {
 		funciones[nombre]();
 	}
-	cerrarAlert();
 }
 
 /** Funciones de sonido **/

@@ -9,10 +9,16 @@
     
     var miTarjeta = juego.card_id;
     var totalPreguntas = juego.question_count;
-    var ultimaAccion = ACCION_NUEVO;
     
     var miTurno = getMiTurno();
     var noJugador = getNoJugador();
+    
+    // Información de los turnos
+    var turnoUsuario;
+    var turnoOponente;
+    
+    // Conteo de acciones.
+    var accion = 0;
     
     // Desplegamos los botones dependiendo de a quien le toca jugar
     $('#total_preguntas').html(totalPreguntas + ' / 5');
@@ -22,10 +28,8 @@
     muestraTablero();
     
     // Desplegamos el mensaje inicial
-    muestraMensajeInicial();
-    
-    // Asignamos la funcionalidad de flip cuando se hace click
-    seleccionarAccionClick('flip');
+    var respuesta;
+    accionUsuario();
     
     function getMiTurno() {
         if (getCache('usuario').id == juego.board.last_action) {
@@ -45,10 +49,15 @@
     
     function muestraBotones() {
         var mnu_botones = '';
-        if (miTurno && miTarjeta !== null) {
-            mnu_botones += '<img id="btn_juego_adivinar" src="img/ju_btn_adivinar.png" onclick="adivinar();"/><img id="btn_juego_preguntar" src="img/ju_btn_preguntar.png" onclick="preguntar();"/>';
-        } else if (miTurno) {
+        if (miTurno && miTarjeta == null) {
             mnu_botones += '<img id="btn_juego_continuar" src="img/btn_continuar.png" onclick="aceptarPartida();"/>';
+        } else if (miTurno && accion == 0) {
+        	mnu_botones += '<img id="btn_juego_continuar" src="img/btn_continuar.png" onclick="accionOponente();"/>';
+        } else if (miTurno) {
+            mnu_botones += '<img id="btn_juego_adivinar" src="img/ju_btn_adivinar.png" onclick="adivinar();"/>';
+            if (totalPreguntas < 5) {
+            	 mnu_botones += '<img id="btn_juego_preguntar" src="img/ju_btn_preguntar.png" onclick="preguntar();"/>';
+            }
         }
         mnu_botones += '<img id="btn_juego_salir" src="img/btn_salir.png" onclick="inicio();" />';
         $('#mnu_botones').html(mnu_botones);
@@ -64,16 +73,20 @@
             	posicion = i;
             }
             
-            var clasesCarta = 'panel ';
-            if (miTurno) {
-                clasesCarta = clasesCarta + 'click ';
-            }
             var estatusCarta = carta.find('estatusJugador' + noJugador).text();
-            switch(estatusCarta) {
+            
+            var clasesCarta = 'panel ';
+            if (miTurno && estatusCarta != 'bloqueado') {
+                clasesCarta += 'click ';
+            }
+            
+            switch (estatusCarta){
                 case 'cerrado':
-                    clasesCarta = clasesCarta + 'flip ';
+                    clasesCarta += 'flip ';
                     break;
                 case 'bloqueado':
+                    clasesCarta += 'flip ';
+                    clasesCarta += 'blocked ';
                     break;
                 default:
                     break;
@@ -108,23 +121,74 @@
         $('#loading').hide();
     }
     
-    function muestraMensajeInicial() {
-        if (miTurno) {
-            if (ultimaAccion == ACCION_NUEVO) {
-            	alert('Es tu turno de preguntar o adivinar.');
-            } else if (ultimaAccion == ACCION_PREGUNTA) {
-                alert('PREGUNTA',
-                      ALERTA_SI_NO,
-                      {
-                      'btn_si' : cancela,
-                      'btn_no' : cancela
-                      });
-            } else if (ultimaAccion == ACCION_ADIVINA) {
-                alert('Tu oponente intentó adivinar pero no adivinó tu personaje.');
-            }
-        } else {
-            alert('Actualmente es el turno de tu oponente');
-        }
+    function accionUsuario() {
+    	var params = {
+    		id : juego.id
+    	};
+    	if (miTurno) {
+    		if (miTarjeta == null || miTarjeta <= 0) {
+				alert('Selecciona la carta que tiene que adivinar tu oponente.');
+			} else {
+				obtenerTurnoJuego(params,
+					function (response, textStatus, jqXHR) {
+						if (response) {
+							turnoUsuario = response;
+						}
+						if (turnoUsuario == null) {
+							accionOponente();
+						} else if (turnoUsuario.question != null) {
+							alert('Tu oponente respondió a "' + turnoUsuario.question + '"<br/> ' + (turnoUsuario.answer ? 'SÍ' : 'NO') + '<br/><br/>Voltea tus cartas y continua.');
+							seleccionarAccionClick('flip');
+						} else {
+							accionOponente();
+						}
+						accion = 1;
+					},
+					function (jqXHR, textStatus, errorThrown) {
+						alert('No se pudo obtener el estado actual del juego. Favor de intentar mas tarde.');
+						inicio();
+					});
+			}
+    	} else {
+			alert('Actualmente es el turno de tu oponente');
+		}
+    }
+    
+    function accionOponente() {
+    	var params = {
+    		id : juego.opponent_game_id
+    	};
+		obtenerTurnoJuego(params,
+			function (response, textStatus, jqXHR) {
+				alert(JSON.stringify(response));
+				muestraBotones();
+				if (response) {
+					turnoOponente = response;
+				}
+				if (turnoOponente == null) {
+					alert('Es tu turno de preguntar o adivinar.');
+					seleccionarAccionClick();
+				} else if (turnoOponente.question != null) {
+					alert('Tu oponente pregunta: ' + turnoOponente.question,
+						ALERTA_PREGUNTA,
+						{
+							'btn_si' : function() { respuesta = true; },
+							'btn_no' : function() { respuesta = false; },
+							'imagen' : '<img class="alerta_tarjeta" src="' + $('#carta_seleccionada .thumb').attr('src') + '" />'
+						});
+					seleccionarAccionClick();
+				} else if (turnoOponente.is_guess) {
+					alert('Tu oponente intentó adivinar pero no adivinó tu personaje.');
+					seleccionarAccionClick();
+				} else {
+					alert('Tu oponente adivinó tu personaje.');
+					seleccionarAccionClick();
+				}
+			},
+			function (jqXHR, textStatus, errorThrown) {
+				alert('No se pudo obtener el estado actual del juego. Favor de intentar mas tarde.');
+				inicio();
+			});
     }
     
     function seleccionarAccionClick(accion) {
@@ -132,8 +196,10 @@
     		$('.click').unbind('click');
     		$('.click').click(
     			function() {
-    				playAudio('flip');
-    				alert($(this).attr('posicion'));
+                    if (!$(this).hasClass('flip')) {
+                        playAudio('flip');
+                        adivinaCarta($(this).attr('posicion'));
+                    }
     			});
     	} else if (accion == 'flip') {
     		$('.click').unbind('click');
@@ -157,37 +223,96 @@
     					$(this).addClass('flip');
     				}
     			});
+    	} else {
+    		$('.click').unbind('click');
     	}
     }
     
-    function adivinar(){
+    /** Preguntar **/
+    function preguntar() {
+		alert('Introduce tu pregunta:',
+			ALERTA_INPUT,
+			{
+				'btn_enviar' : preguntaCarta
+			});
+	}
+	
+	function preguntaCarta() {
+		if ($('alerta_input').val() != '') {
+			if (respuesta == null) {
+				respuesta = false;
+			}
+			var params = {
+				id : juego.id,
+				detail_xml : (new XMLSerializer()).serializeToString(xmlDoc),
+				answer : respuesta,
+				question : $('#alerta_input').val()
+			};
+			preguntarJuego(params,
+				function (response, textStatus, jqXHR) {
+					if (response.board_id == juego.board_id) {
+						alert('Tu pregunta fue enviada. Es turno de tu contrincante.');
+						inicio();
+					} else {
+						alert('No se pudo enviar tu pregunta. Favor de intentar mas tarde.');
+					}
+				},
+				function (jqXHR, textStatus, errorThrown) {
+					alert('No se pudo enviar tu pregunta. Favor de intentar mas tarde.');
+				});
+        } else {
+        	alert('Debes de escribir la pregunta que vas a enviar a tu oponente.');
+        }
+    }
+	
+	/** Adivinar **/
+    function adivinar() {
         seleccionarAccionClick('seleccion');
         $('#btn_juego_adivinar').attr('src','img/btn_continuar.png');
         $('#btn_juego_adivinar').attr('onclick','cancelarAdivinar();');
     }
     
-    function cancelarAdivinar(){
+    function cancelarAdivinar() {
         seleccionarAccionClick('flip');
         $('#btn_juego_adivinar').attr('src','img/ju_btn_adivinar.png');
         $('#btn_juego_adivinar').attr('onclick','adivinar();');
     }
-    
-    function preguntar() {
-		alert('Introduce tu pregunta:',
-              ALERTA_INPUT,
-              {
-              'btn_enviar' : enviaTablero
-              });
-	}
-    
-    function enviaTablero() {
-        navigator.notification.alert('Estoy enviando el tablero: ' + (new XMLSerializer()).serializeToString(xmlDoc));
-    }
 	
-	function cancela() {
+	function adivinaCarta(posicion) {
+		if (respuesta == null) {
+			respuesta = false;
+		}
         
+        var cartaAdivinada = xml.find('carta[posicion=' + posicion + ']');        
+        cartaAdivinada.find('estatusJugador' + noJugador).text('bloqueado');
+        
+		var params = {
+			id : juego.id,
+			detail_xml : (new XMLSerializer()).serializeToString(xmlDoc),
+			answer : respuesta,
+			card_id : parseInt($('.cartaTablero[posicion="' + posicion + '"]').attr('id'))
+		};
+		adivinarJuego(params,
+			function (response, textStatus, jqXHR) {
+				if (response.winner_id == null) {
+					alert('Lo sentimos, no adivinaste el personaje.');
+					inicio();
+				} else {
+					alert('¡Ganaste! ¿Deseas continuar otra partida?',
+						ALERTA_NUEVO_JUEGO,
+						{
+							'btn_nuevo_juego' : function() {
+								setCache('nuevo_oponente', juego.opponent_game.user);
+								abrirTemplate('juegoNuevoTablero.html');
+							},
+							'btn_salir' : function() { inicio(); }
+						});
+				}
+			},
+			function (jqXHR, textStatus, errorThrown) {
+				alert('No se pudo enviar tu petición. Favor de intentar mas tarde.');
+			});
 	}
-	
 	
 	/* Funciones para aceptar un juego */
 	var posicionSeleccionada = null;
@@ -219,6 +344,9 @@
 			aceptarJuego(params,
 				function(response, textStatus, jqXHR) {
 					if (response && response.id && response.id > 0) {
+						// Cambiar botones
+						// Me dijo que adivinó al prinicpio
+                        accion = 1;
 						muestraBotones();
 						alert('Tu carta ha sido guardada y ahora es tu turno de preguntar o adivinar.');
 					} else {
