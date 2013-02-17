@@ -5,7 +5,7 @@
     var posicionSeleccionada = null;
         
     // Obtenemos el tipo de tablero que se debe generar
-    var tipoTablero = 'amigos';
+    var tipoTablero = TIPO_CARTA_AMIGO;
     
     // Obtenemos todos los personajes y famosos con los que se generarán los tableros y los desplegamos
     getTablero();
@@ -30,13 +30,13 @@
         // Arreglo que contiene las 20 cartas que conformarán el tablero
         var tablero = new Array();
         switch(tipoTablero) {
-            case 'personajes':
+            case TIPO_CARTA_PERSONAJE:
                 cartas = getCache('personajes');
             	break;
-            case 'famosos':
+            case TIPO_CARTA_FAMOSO:
             	cartas = getCache('famosos');
             	break;
-            case 'amigos':
+            case TIPO_CARTA_AMIGO:
             	cartas = getCache('amigos');
             	break;
             default:
@@ -64,7 +64,7 @@
         if (!tipoTablero) {
             tipoTablero = 'amigos';
         }
-        generarTablero(tipoTablero)
+        generarTablero(tipoTablero);
     }
     
     function seleccionarPersonaje(posicion) {
@@ -92,20 +92,29 @@
     }
     
     function crearPartida() {
-    	var params = {
-			user_id : getCache('usuario').id,
-			detail_xml : crearXML(),
-			card_id : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id'),
-			card_name : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').find('.nombre').attr('nombre'),
-			card_type : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo'),
-			opponent_id : getCache('nuevo_oponente').id,
-			opponent_name : getCache('nuevo_oponente').nombre
-		};
+        var facebook_id = null;
+        var card_id = null;
+        if (parseInt($('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo')) == TIPO_CARTA_AMIGO) {
+            facebook_id = $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id');
+        } else {
+            card_id = $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id');
+        }
+        var params = {
+            user_id : getCache('usuario').id,
+            detail_xml : crearXML(),
+            card_id : card_id,
+            card_facebook_id : facebook_id,
+                card_name : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').find('.nombre').attr('nombre'),
+                card_type : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo'),
+                opponent_id : getCache('nuevo_oponente').id,
+                opponent_name : getCache('nuevo_oponente').nombre
+            };
     	crearJuego(
 			params,
 			function(response, textStatus, jqXHR) {
 				if (response && response.id && response.id > 0) {
 					alert('Tu partida ha sido creada y se ha enviado la solicitud a tu oponente.');
+                    app.sendNotification(response.id, getCache('usuario').first_name + " te ha invitado a una partida.", true, 1);
 					inicio();
 				} else {
 					alert('Tu partida no se pudo crear correctamente. Favor de intentar nuevamente.');
@@ -119,11 +128,10 @@
     function crearXML() {
     	var jugador1 = getCache('usuario').facebook_id;
     	var jugador2 = getCache('nuevo_oponente').id;
-    	var tipo = getCache('tipoTablero');
     	
     	var xml = '<?xml version="1.0"?>';
     	xml += '<partida jugador1="' + jugador1 + '" jugador2="' + jugador2 + '">';
-    	xml += '<tablero tipo="' + tipo + '">';
+    	xml += '<tablero tipo="' + tipoTablero + '">';
     	$('#cuadro_negro .carta').each(
     		function() {
     			xml += '<carta posicion="' + $(this).attr('posicion') + '" id="' + $(this).attr('id') + '" ruta="' + encodeURIComponent($(this).find('img.thumb').attr('src')) + '" nombre="' + $(this).find('span.nombre').html() + '">';

@@ -7,7 +7,15 @@
     var xmlDoc = $.parseXML(juego.board.detail_xml);
     var xml = $(xmlDoc);
     
-    var miTarjeta = juego.card_id;
+    var miTarjeta = null;
+    if(juego.card != null){
+        if (juego.card.facebook_id != null) {
+            miTarjeta = juego.card.facebook_id;
+        } else {
+            miTarjeta = juego.card.id;
+        }
+    }
+    
     var totalPreguntas = juego.question_count;
     
     var miTurno = getMiTurno();
@@ -252,6 +260,8 @@
 				function (response, textStatus, jqXHR) {
 					if (response.board_id == juego.board_id) {
 						alert('Tu pregunta fue enviada. Es turno de tu contrincante.');
+                        console.info("DEBUGGEANDO APP " + app);
+                        app.sendNotification(juego.id, getCache('usuario').first_name + " te envio una pregunta", true, 1);
 						inicio();
 					} else {
 						alert('No se pudo enviar tu pregunta. Favor de intentar mas tarde.');
@@ -273,10 +283,10 @@
     }
     
     function cancelarAdivinar() {
-        seleccionarAccionClick('flip');
-        $('#btn_juego_adivinar').attr('src','img/ju_btn_adivinar.png');
-        $('#btn_juego_adivinar').attr('onclick','adivinar();');
-    }
+        seleccionarAccionClick('flip');
+        $('#btn_juego_adivinar').attr('src','img/ju_btn_adivinar.png');
+        $('#btn_juego_adivinar').attr('onclick','adivinar();');
+    }
 	
 	function adivinaCarta(posicion) {
 		if (respuesta == null) {
@@ -290,14 +300,17 @@
 			id : juego.id,
 			detail_xml : (new XMLSerializer()).serializeToString(xmlDoc),
 			answer : respuesta,
-			card_id : parseInt($('.cartaTablero[posicion="' + posicion + '"]').attr('id'))
+			card_id : parseInt($('.cartaTablero[posicion="' + posicion + '"]').attr('id')),
+            card_type : juego.card.template_id
 		};
 		adivinarJuego(params,
 			function (response, textStatus, jqXHR) {
-				if (response.winner_id == null) {
+				if (response.board.winner_id == null) {
 					alert('Lo sentimos, no adivinaste el personaje.');
+                    app.sendNotification(juego.id, getCache('usuario').first_name + " intentó adivinar tu personaje.", true, 1);
 					inicio();
 				} else {
+                    app.sendNotification(juego.id, getCache('usuario').first_name + " ha ganado la partida.", true, 1);
 					alert('¡Ganaste! ¿Deseas continuar otra partida?',
 						ALERTA_NUEVO_JUEGO,
 						{
@@ -338,7 +351,7 @@
 				id : juego.id,
 				card_id : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id'),
 				card_name : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').find('.nombre').attr('nombre'),
-				card_type : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo'),
+				card_type : xml.find('tablero').attr('tipo'),
 				card_facebook_id : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id')
 			};
 			aceptarJuego(params,

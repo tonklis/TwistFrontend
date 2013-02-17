@@ -89,7 +89,7 @@
                     }
                   
 					$div.find('.btn_borrar').click(function(event) {
-						confirmacion(juego.board);
+						confirmacion(juego);
 						event.stopImmediatePropagation();
 					});
 					
@@ -104,24 +104,24 @@
 	}
 	
 	// Funcionalidad de los botones de borrar
-	function confirmacion(board) {
+	function confirmacion(game) {
 		alert('¿Deseas abandonar esta partida? Se perderan todos los datos.',
 			 ALERTA_SI_NO,
 			 {
 			 	'btn_no' : cancela,
-              'btn_si' : function () {confirma(board)}
+              'btn_si' : function () {confirma(game)}
 			 });
 	}
 	
 	function cancela() {
 	}
 	
-	function confirma(board) {
+	function confirma(game) {
         
-        if (board.status == ESTATUS_ABANDONO) {
-            cerrarJuego({ id : board.id },
+        if (game.board.status == ESTATUS_ABANDONO) {
+            cerrarJuego({ id : game.board.id },
                 function(response, textStatus, jqXHR) {
-                    if(response.id == board.id){
+                    if(response.id == game.board.id){
                         refrescar();
                     } else {
                         alert('No se pudo cerrar el juego. Por favor intenta mas tarde.');
@@ -133,9 +133,10 @@
                 });
             
         } else {
-            abandonarJuego({ id : board.id, user_id : usuario.id },
+            abandonarJuego({ id : game.board.id, user_id : usuario.id },
                 function(response, textStatus, jqXHR) {
-                    if(response.id == board.id){
+                    if(response.id == game.board.id){
+                    app.sendNotification(response.id, getCache('usuario').first_name + " ha abandonado la partida.", true, 1);
                         inicio();
                     } else {
                         alert('No se pudo abandonar el juego. Por favor intenta mas tarde.');

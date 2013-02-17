@@ -72,11 +72,12 @@ var app = {
                                         app.linkDevice(status.deviceToken, getCache('usuario').facebook_id);
                                         });
     },
-    sendNotification: function(game_id, message, sound) {
+    sendNotification: function(game_id, message, sound, badge) {
+        console.info("DEBUGGEANDO SEND NOTIFICATION ");
         var xmlhttp=new XMLHttpRequest();
         xmlhttp.open("POST","http://"+URL+"/ios_send_notification_to_opponent.json",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        xmlhttp.send("token="+token+"&message="+message+"&sound="+sound+"&badge="+badge);
+        xmlhttp.send("game_id="+game_id+"&message="+message+"&sound="+sound+"&badge="+badge);
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState==4) {
                 console.log("Registration response: " + xmlhttp.responseText);
@@ -132,8 +133,8 @@ var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
 var templateDashboard = "dashboard.html";
 
-//var URL = "192.168.1.225:3000";
-var URL = "still-eyrie-7957.herokuapp.com";
+var URL = "192.168.1.225:3000";
+//var URL = "still-eyrie-7957.herokuapp.com";
 
 var appId = "336541486458847";
 var sistemaOperativo = "iOS"; //iOS

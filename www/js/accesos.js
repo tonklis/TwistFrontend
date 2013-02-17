@@ -22,7 +22,8 @@ var SERVICIO_CERRAR = 12;
  *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
  **/
 function invocarServicio(tipo, params, funcionSuccess, funcionError) {
-	var url = "http://still-eyrie-7957.herokuapp.com/";
+	//var url = "http://still-eyrie-7957.herokuapp.com/";
+    var url = "http://192.168.1.225:3000/";
 	var paramsCompletos = false;
 	switch (tipo) {
 		case SERVICIO_LOGIN:
@@ -63,7 +64,7 @@ function invocarServicio(tipo, params, funcionSuccess, funcionError) {
 			}
 			break;
 		case SERVICIO_CREAR_JUEGO:
-			if (params.user_id && params.detail_xml && params.card_id && params.opponent_id && params.opponent_name) {
+			if (params.user_id && params.detail_xml && params.opponent_id && params.opponent_name) {
 				url += "games/start.json";
 				paramsCompletos = true;
 			}
