@@ -36,8 +36,6 @@
 					if (juego.board.last_action == usuario.id) {
 						visible = false;
 					}
-				} else if (juego.board.status == ESTATUS_FINALIZO) {
-					// Esperar a variable visible
 				}
 				
 				if (visible) {
@@ -109,7 +107,7 @@
 			 ALERTA_SI_NO,
 			 {
 			 	'btn_no' : cancela,
-              'btn_si' : function () {confirma(game)}
+			 	'btn_si' : function () { confirma(game); }
 			 });
 	}
 	
@@ -117,34 +115,34 @@
 	}
 	
 	function confirma(game) {
-        
         if (game.board.status == ESTATUS_ABANDONO) {
             cerrarJuego({ id : game.board.id },
                 function(response, textStatus, jqXHR) {
-                    if(response.id == game.board.id){
-                        refrescar();
+                    if (response.id == game.board.id) {
+                        inicio();
                     } else {
+                    	('#loading').hide();
                         alert('No se pudo cerrar el juego. Por favor intenta mas tarde.');
                     }
                 },
                 function(jqXHR, textStatus, errorThrown) {
+                	('#loading').hide();
                     alert('No se pudo cerrar el juego. Por favor intenta mas tarde.');
-                    $('#loading').hide();
                 });
             
         } else {
             abandonarJuego({ id : game.board.id, user_id : usuario.id },
                 function(response, textStatus, jqXHR) {
                     if(response.id == game.board.id){
-                    app.sendNotification(response.id, getCache('usuario').first_name + " ha abandonado la partida.", true, 1);
                         inicio();
                     } else {
+                    	('#loading').hide();
                         alert('No se pudo abandonar el juego. Por favor intenta mas tarde.');
                     }
                 },
                 function(jqXHR, textStatus, errorThrown) {
+                	('#loading').hide();
                     alert('No se pudo abandonar el juego. Por favor intenta mas tarde.');
-                    $('#loading').hide();
                 });
         }
         
