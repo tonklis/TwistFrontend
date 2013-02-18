@@ -62,6 +62,7 @@
     
     function seleccionarTablero(tipoTablero) {
         generarTablero(tipoTablero);
+        actualizarBotones(tipoTablero);
     }
     
     function seleccionarPersonaje(posicion) {
@@ -81,9 +82,15 @@
         // Aquí va la lógica que crea la partida en el backend
         console.log('Probando... Probando...');
         if (posicionSeleccionada != null) {
-        	enviarPostFB('' + getCache('nuevo_oponente').id, function(response) {
+        	if (getCache('aj_post')) {
+				enviarPostFB('' + getCache('nuevo_oponente').id, function(response) {
+					$('#loading').show();
+					crearPartida();
+				});
+        	} else {
+        		$('#loading').show();
         		crearPartida();
-        	});
+        	}
         } else {
             alert('Debes seleccionar tu carta para continuar.');
         }
@@ -115,10 +122,12 @@
 					app.sendNotification(response.id, getCache('usuario').first_name + " te ha invitado a una partida.", true, 1);
 					inicio();
 				} else {
+					$('#loading').hide();
 					alert('Tu partida no se pudo crear correctamente. Favor de intentar nuevamente.');
 				}
 			},
 			function(jqXHR, textStatus, errorThrown) {
+				$('#loading').hide();
 				alert('Tu partida no se pudo crear correctamente. Favor de intentar nuevamente.');
 			});
     }
@@ -146,6 +155,23 @@
     function funcionError(response) {
         alert('Lo sentimos, hubo un error al cargar el tablero');
         $('#loading').hide();
+    }
+    
+    function actualizarBotones(tipo) {
+    	$('#btn_tablero_personajes').attr('src', 'img/nu_btn_personajes.png');
+    	$('#btn_tablero_amigos').attr('src', 'img/nu_btn_amigos.png');
+    	$('#btn_tablero_famosos').attr('src', 'img/nu_btn_famosos.png');
+    	switch(tipo) {
+    		case TIPO_CARTA_PERSONAJE:
+    			$('#btn_tablero_personajes').attr('src', 'img/nu_btn_personajes_over.png');
+    			break;
+    		case TIPO_CARTA_AMIGO:
+    			$('#btn_tablero_amigos').attr('src', 'img/nu_btn_amigos_over.png');
+    			break;
+    		case TIPO_CARTA_FAMOSO:
+    			$('#btn_tablero_famosos').attr('src', 'img/nu_btn_famosos_over.png');
+    			break;
+    	}
     }
 </script>
 <div id="seleccionTablero">

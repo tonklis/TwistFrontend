@@ -348,6 +348,48 @@ body:after {
 	z-index: 15;
 }
 
+/** AJUSTES **/
+.forma .titulo {
+	margin-top: 1em;
+	
+	font-size: 150%;
+	font-family: gotham-bold;
+	text-transform: uppercase;
+	
+	clear: both;
+}
+
+.forma .forma_renglon {
+	clear: both;
+	
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
+}
+
+.forma .separador {
+	clear: both;
+	height: 0.5em;
+}
+
+.forma .texto {
+	font-size: 70%;
+}
+
+.forma label {
+	width: 60%;
+	float: left;
+	text-align: left;
+	
+	margin-left: 3em;
+}
+
+.forma .slider {
+	float: right;
+	text-align: left;
+	
+	margin-right: 3em;
+}
+
 /** DASHBOARD **/
 #mnu_monedas {
 	position: absolute;
@@ -386,11 +428,11 @@ body:after {
 }
 
 #mnu_botones img {
-	width: 75%;
+	width: 90%;
 }
 
 .mnu_botones_small img {
-	width: 65% !important;
+	width: 80% !important;
 }
 
 .partida {

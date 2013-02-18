@@ -107,6 +107,7 @@
 					$('.cartaOponente').hide();
 					$('.shortcutJugando').show();
 					$('.oponenteJugando').show();
+					actualizarBotones(tipo);
     			}
     			break;
     		case 'todos':
@@ -115,6 +116,7 @@
     			filtroJugando = false;
     			$('.cartaShortcut').show();
     			$('.cartaOponente').show();
+    			actualizarBotones(tipo);
     			break;
     	}
     }
@@ -163,6 +165,20 @@
         } else {
             alert('Debes seleccionar tu oponente para continuar.');
         }
+    }
+    
+    function actualizarBotones(tipo) {
+    	$('#btn_amigos_fb').attr('src', 'img/nu_amigos_fb.png');
+    	$('#btn_amigos_jugando').attr('src', 'img/nu_amigos_jugando.png');
+    	switch(tipo) {
+    		case 'jugando':
+    			$('#btn_amigos_jugando').attr('src', 'img/nu_amigos_jugando_over.png');
+    			break;
+    		case 'todos':
+    		default:
+    			$('#btn_amigos_fb').attr('src', 'img/nu_amigos_fb_over.png');
+    			break;
+    	}
     }
 </script>
 <div id="nuevaPartida">

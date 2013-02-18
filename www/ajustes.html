@@ -2,6 +2,11 @@
 	// Javascript que se ejecute al iniciar la página.
 	function actualizarAjuste(evento) {
 		setCache(evento.target.id, (evento.target.value == 'on'));
+		if ($('#aj_notificacion').value == 'on') {
+			pushNotification.enablePush();
+		} else {
+			pushNotification.disablePush();
+		}
 	}
 	
 	$('select').each(function() {
@@ -18,30 +23,36 @@
 	</div>
 	<div class="derecha">
 		<div id="cuadro_negro" class="forma">
+			<div class="titulo">Ajustes</div>
 			<div class="forma_renglon">
 				<label for="aj_notificacion">Avisos:</label>
-				<select name="aj_notificacion" id="aj_notificacion" data-role="slider" onchange="actualizarAjuste(event);">
+				<select name="aj_notificacion" id="aj_notificacion" class="slider" onchange="actualizarAjuste(event);">
 					<option value="on">Sí</option>
 					<option value="off">No</option>
 				</select>
 			</div>
 			<div class="forma_renglon">
 				<label for="aj_post">Post en Facebook:</label>
-				<select name="aj_post" id="aj_post" data-role="slider" onchange="actualizarAjuste(event);">
+				<select name="aj_post" id="aj_post" class="slider" onchange="actualizarAjuste(event);">
 					<option value="on">Sí</option>
 					<option value="off">No</option>
 				</select>
 			</div>
 			<div class="forma_renglon">
 				<label for="aj_sonido">Sonido:</label>
-				<select name="aj_sonido" id="aj_sonido" data-role="slider" onchange="actualizarAjuste(event);">
+				<select name="aj_sonido" id="aj_sonido" class="slider" onchange="actualizarAjuste(event);">
 					<option value="on">Sí</option>
 					<option value="off">No</option>
 				</select>
 			</div>
-			<div class="forma_renglon">
-			
+			<div class="separador"></div>
+			<div class="titulo">Aviso de Privacidad</div>
+			<div class="texto">
+				Banco Santander (Mexico) S.A. Institución de Banca Múltiple, Grupo Financiero Santander México
+				señalando como domicilio convencional para los efectos relacionados con el presente aviso el señalado en
+				Av....
 			</div>
+
 		</div>
 	</div>
 </div>
