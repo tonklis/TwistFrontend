@@ -11,6 +11,7 @@ var SERVICIO_PREGUNTAR = 9;
 var SERVICIO_ADIVINAR = 10;
 var SERVICIO_ABANDONAR = 11;
 var SERVICIO_CERRAR = 12;
+var RESETEAR_BADGES = 13;
 
 /**
  * Función que invoca los servicios del servidor.
@@ -108,6 +109,13 @@ function invocarServicio(tipo, params, funcionSuccess, funcionError) {
 			if (params.id) {
 				url += "boards/close/" + params.id + ".json";
 				delete params.id;
+				paramsCompletos = true;
+			}
+			break;
+        case RESETEAR_BADGES:
+			if (params.id) {
+				url += "users/reset_badges/"+ params.id +".json";
+                delete params.id;
 				paramsCompletos = true;
 			}
 			break;
