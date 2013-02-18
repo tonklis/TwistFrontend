@@ -73,7 +73,6 @@ var app = {
                                         });
     },
     sendNotification: function(game_id, message, sound, badge) {
-        console.info("DEBUGGEANDO SEND NOTIFICATION ");
         var xmlhttp=new XMLHttpRequest();
         xmlhttp.open("POST","http://"+URL+"/ios_send_notification_to_opponent.json",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
@@ -133,8 +132,8 @@ var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
 var templateDashboard = "dashboard.html";
 
-var URL = "192.168.1.225:3000";
-//var URL = "still-eyrie-7957.herokuapp.com";
+//var URL = "192.168.1.225:3000";
+var URL = "still-eyrie-7957.herokuapp.com";
 
 var appId = "336541486458847";
 var sistemaOperativo = "iOS"; //iOS
@@ -353,7 +352,14 @@ function obtieneCarta(elemento, posicion, onclick, clases) {
 	if (clases === undefined) {
 		clases = '';
 	}
-	return '<div id="' + elemento.id + '" class="carta cartaTablero ' + clases + '" posicion="' + posicion + '" tipo="' + elemento.template_id + '" onclick="' + onclick + '"><div class="front"><img id="thumb_loading_' + posicion + '" class="thumb_loading" src="img/loading_150.gif" /><img id="thumb_' + posicion + '" id_loader="thumb_loading_' + posicion + '" class="thumb" src="' + elemento.url + '"/><span class="nombre" nombre="' + elemento.description + '">' + limitaTexto(obtenPrimerNombre(elemento.description), 10) + '</span></div><div class="back"><img src="img/ju_carta_logo.png"/></div></div>';
+                          
+    if (elemento.estatus == 'bloqueado'){
+        imagenCarta = 'img/ju_carta_bloqueada.png';
+    } else {
+        imagenCarta = 'img/ju_carta_logo.png';
+    }
+	
+    return '<div id="' + elemento.id + '" class="carta cartaTablero ' + clases + '" posicion="' + posicion + '" tipo="' + elemento.template_id + '" onclick="' + onclick + '"><div class="front"><img id="thumb_loading_' + posicion + '" class="thumb_loading" src="img/loading_150.gif" /><img id="thumb_' + posicion + '" id_loader="thumb_loading_' + posicion + '" class="thumb" src="' + elemento.url + '"/><span class="nombre" nombre="' + elemento.description + '">' + limitaTexto(obtenPrimerNombre(elemento.description), 10) + '</span></div><div class="back"><img src="' + imagenCarta + '"/></div></div>';
 }
 
 function loaderCartas() {

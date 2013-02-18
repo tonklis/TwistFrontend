@@ -22,8 +22,7 @@ var SERVICIO_CERRAR = 12;
  *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
  **/
 function invocarServicio(tipo, params, funcionSuccess, funcionError) {
-	//var url = "http://still-eyrie-7957.herokuapp.com/";
-    var url = "http://192.168.1.225:3000/";
+	var url = "http://still-eyrie-7957.herokuapp.com/";
 	var paramsCompletos = false;
 	switch (tipo) {
 		case SERVICIO_LOGIN:

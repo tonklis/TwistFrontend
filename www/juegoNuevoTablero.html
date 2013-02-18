@@ -61,9 +61,6 @@
     }
     
     function seleccionarTablero(tipoTablero) {
-        if (!tipoTablero) {
-            tipoTablero = 'amigos';
-        }
         generarTablero(tipoTablero);
     }
     
@@ -82,8 +79,9 @@
     
     function validarPartida() {
         // Aquí va la lógica que crea la partida en el backend
+        console.log('Probando... Probando...');
         if (posicionSeleccionada != null) {
-        	enviarPostFB(getCache('nuevo_oponente').id, function(response) {
+        	enviarPostFB('' + getCache('nuevo_oponente').id, function(response) {
         		crearPartida();
         	});
         } else {
@@ -92,29 +90,29 @@
     }
     
     function crearPartida() {
-        var facebook_id = null;
-        var card_id = null;
-        if (parseInt($('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo')) == TIPO_CARTA_AMIGO) {
-            facebook_id = $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id');
-        } else {
-            card_id = $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id');
-        }
-        var params = {
-            user_id : getCache('usuario').id,
-            detail_xml : crearXML(),
-            card_id : card_id,
-            card_facebook_id : facebook_id,
-                card_name : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').find('.nombre').attr('nombre'),
-                card_type : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo'),
-                opponent_id : getCache('nuevo_oponente').id,
-                opponent_name : getCache('nuevo_oponente').nombre
-            };
+    	var facebook_id = null;
+    	var card_id = null;
+    	if (parseInt($('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo')) == TIPO_CARTA_AMIGO) {
+    		facebook_id = $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id');
+    	} else {
+    		card_id = $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('id');
+    	}
+    	var params = {
+			user_id : getCache('usuario').id,
+			detail_xml : crearXML(),
+			card_id : card_id,
+			card_facebook_id : facebook_id,
+			card_name : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').find('.nombre').attr('nombre'),
+			card_type : $('.cartaTablero[posicion="' + posicionSeleccionada + '"]').attr('tipo'),
+			opponent_id : getCache('nuevo_oponente').id,
+			opponent_name : getCache('nuevo_oponente').nombre
+		};
     	crearJuego(
 			params,
 			function(response, textStatus, jqXHR) {
 				if (response && response.id && response.id > 0) {
 					alert('Tu partida ha sido creada y se ha enviado la solicitud a tu oponente.');
-                    app.sendNotification(response.id, getCache('usuario').first_name + " te ha invitado a una partida.", true, 1);
+					app.sendNotification(response.id, getCache('usuario').first_name + " te ha invitado a una partida.", true, 1);
 					inicio();
 				} else {
 					alert('Tu partida no se pudo crear correctamente. Favor de intentar nuevamente.');
@@ -156,12 +154,12 @@
             <div id="mnu_carta"></div>
             <div id="mnu_botones">
             	<div class="mnu_botones_small">
-					<img id="btn_tablero_personajes" src="img/nu_btn_personajes.png" onclick="seleccionarTablero('personajes');" />
-    	            <img id="btn_tablero_amigos" src="img/nu_btn_amigos.png" onclick="seleccionarTablero('amigos');" />
-	                <img id="btn_tablero_famosos" src="img/nu_btn_famosos.png" onclick="seleccionarTablero('famosos');" />
+					<img id="btn_tablero_personajes" src="img/nu_btn_personajes.png" onclick="seleccionarTablero(TIPO_CARTA_PERSONAJE);" />
+    	            <img id="btn_tablero_amigos" src="img/nu_btn_amigos.png" onclick="seleccionarTablero(TIPO_CARTA_AMIGO);" />
+	                <img id="btn_tablero_famosos" src="img/nu_btn_famosos.png" onclick="seleccionarTablero(TIPO_CARTA_FAMOSO);" />
                 </div>
                 <img id="btn_tablero_continuar" src="img/btn_continuar.png" onclick="validarPartida();" />
-                <img id="btn_tablero_salir" src="img/btn_salir.png" onclick="inicio();" />
+                <img id="btn_tablero_salir" src="img/btn_regresar.png" onclick="inicio();" />
 			</div>
 		</div>
 	</div>
