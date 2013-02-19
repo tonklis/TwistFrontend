@@ -11,7 +11,7 @@ var SERVICIO_PREGUNTAR = 9;
 var SERVICIO_ADIVINAR = 10;
 var SERVICIO_ABANDONAR = 11;
 var SERVICIO_CERRAR = 12;
-var RESETEAR_BADGES = 13;
+var SERVICIO_RESETEAR_BADGES = 13;
 
 /**
  * Función que invoca los servicios del servidor.
@@ -23,7 +23,8 @@ var RESETEAR_BADGES = 13;
  *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
  **/
 function invocarServicio(tipo, params, funcionSuccess, funcionError) {
-	var url = "http://still-eyrie-7957.herokuapp.com/";
+	//var url = "http://still-eyrie-7957.herokuapp.com/";
+    var url = "http://192.168.1.128:3000/";
 	var paramsCompletos = false;
 	switch (tipo) {
 		case SERVICIO_LOGIN:
@@ -111,7 +112,7 @@ function invocarServicio(tipo, params, funcionSuccess, funcionError) {
 				paramsCompletos = true;
 			}
 			break;
-        case RESETEAR_BADGES:
+        case SERVICIO_RESETEAR_BADGES:
 			if (params.id) {
 				url += "users/reset_badges/"+ params.id +".json";
                 delete params.id;
@@ -340,4 +341,17 @@ function abandonarJuego(params, funcionSuccess, funcionError) {
  **/
 function cerrarJuego(params, funcionSuccess, funcionError) {
 	invocarServicio(SERVICIO_CERRAR, params, funcionSuccess, funcionError);
+}
+
+/**
+ * Función que resetea el número de alertas-globo en la base de datos de usuarios.
+ * @param params es un objeto que debe tener las siguientes propiedades:
+ *   id: El id del usuario
+ * @param funcionSuccess función que se invocará cuando se haya realizado una petición
+ *   satisfactoria con los parámetros function(response, textStatus, jqXHR);
+ * @param funcionError función que se invocará cuando se haya realizado una petición
+ *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
+ **/
+function resetearBadges(params, funcionSuccess, funcionError) {
+	invocarServicio(SERVICIO_RESETEAR_BADGES, params, funcionSuccess, funcionError);
 }
