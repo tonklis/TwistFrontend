@@ -7,7 +7,9 @@
 	var amigosJugando = 0;
     var posicionSeleccionada = null;
     
-    crearOponentes();
+    setTimeout(function() {
+    	crearOponentes();
+    }, 1000);
     
     // funciones para inicializar la lista de oponentes
     function crearOponentes() {
@@ -55,6 +57,7 @@
 							$('.derecha').html(getGridOponentes());
 							loaderCartas();
 							$('#loading').hide();
+							mostrarShortcut('A');
 						});
 				} else {
 					alert("No se pudo obtener la lista de tus amigos. Por favor intenta hacer un evento nuevamente.");
@@ -187,7 +190,7 @@
 			<div id="mnu_carta"><img class="instruccion" src="img/nu_selecciona_oponente.png"/></div>
 			<div id="mnu_botones">
 				<div class="mnu_botones_small">
-					<img id="btn_amigos_fb" src="img/nu_amigos_fb.png" onclick="filtrar('todos');" />
+					<img id="btn_amigos_fb" src="img/nu_amigos_fb_over.png" onclick="filtrar('todos');" />
     	            <img id="btn_amigos_jugando" src="img/nu_amigos_jugando.png" onclick="filtrar('jugando');" />
                 </div>
 				<img id="btn_continuar" src="img/btn_continuar.png" onclick="continuar()" />

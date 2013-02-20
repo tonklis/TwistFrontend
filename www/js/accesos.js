@@ -125,12 +125,6 @@ function invocarServicio(tipo, params, funcionSuccess, funcionError) {
 	
 	// navigator.notification.alert('url: ' + url + ', params: ' + JSON.stringify(params), null, 'AdivinaMe');
 	if (paramsCompletos) {
-		var request = $.ajax({
-			url: url,
-			type: "post",
-			data: params
-		});
-		
 		if (funcionSuccess === undefined) {
 			funcionSuccess = function(response, textStatus, jqXHR) {
 				console.log('success ' + tipo + ': ' + response);
@@ -142,12 +136,21 @@ function invocarServicio(tipo, params, funcionSuccess, funcionError) {
 			}
 		}
 		
+		var request = $.ajax({
+			url: url,
+			type: "post",
+			data: params,
+			timeout: 30000
+		});
 		request.done(function (response, textStatus, jqXHR) {
 			funcionSuccess(response, textStatus, jqXHR);
 		});
-		
 		request.fail(function (jqXHR, textStatus, errorThrown) {
 			funcionError(jqXHR, textStatus, errorThrown);
+			if (textStatus == 'timeout') {
+				alert('Al parecer tu conexión a internet es inestable. Por favor vuelve a intentar.');
+				inicio();
+			}
 		});
 	} else {
 		console.log('Parámetros insuficientes para invocar el servicio.');

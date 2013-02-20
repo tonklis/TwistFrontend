@@ -35,6 +35,9 @@
             inicializar = function() {
 				clearCache();
 				$('#alertas').load('alertas.html');
+				setTimeout(function() {
+					$('#btn_conectar_fb').show();
+				}, 10000);
             }
             
             /* Sobrescribimos la función que se invoca al cargar la página. */

@@ -38,14 +38,13 @@ var app = {
     	}
     },
     onResume: function() {
-        resetearBadges({ id : getCache('usuario').id },
-                                function(response, textStatus, jqXHR) {
-                                    app.setBadges(0);
-                                    app.getPending();
-                                },
-                                function(jqXHR, textStatus, errorThrown) {
-
-                        });
+    	resetearBadges({ id : getCache('usuario').id },
+    						function(response, textStatus, jqXHR) {
+    							app.setBadges(0);
+    							app.getPending();
+    						},
+                            function(jqXHR, textStatus, errorThrown) {
+                            });
         inicio();
     },
     getBadges: function() {
@@ -143,7 +142,7 @@ var URL = "192.168.1.128:3000";
 
 var appId = "336541486458847";
 var sistemaOperativo = "iOS"; //iOS
-// var sistemaOperativo = "iOS"; //Android
+// var sistemaOperativo = "Android"; //Android
 var agente = navigator.userAgent;
 
 var TIPO_CARTA_FAMOSO = 1;
@@ -189,41 +188,51 @@ function init() {
 			useCachedDialogs : false,
 			frictionlessRequests : true
 		});
-		FB.getLoginStatus(
-			function (response) {
-				if (response.status == 'connected') {
-					if (!isCache('usuario')) {
-						FB.api('/me', function (me) {
-							checkPermissions(function() {
-								var params = {
-									facebook_id	: me.id,
-									first_name	: me.first_name,
-									last_name	: me.last_name,
-									email		: me.email
-								};
-								invocarLogin(params,
-									function (response, textStatus, jqXHR) {
-										setCache('usuario', response);
-										iniciarProceso();
-										app.registerWithFacebook();
-									},
-									function(jqXHR, textStatus, errorThrown) {
-										alert('No pudimos conectarnos con el servidor de Adivina-Me, vuelve a intentarlo mas tarde.');
-										mostrarConectar();
-									});
-							});
-						});
-					} else {
-						checkPermissions(function() {
-							iniciarProceso();
-						});
-					}
-				} else {
-					mostrarConectar();
-				}
-			});
 	}
 }
+
+FB.Event.subscribe(
+	'auth.login',
+	function(responseS) {
+		FB.getLoginStatus(function (response) {
+			if (response.status == 'connected') {
+				if (!isCache('usuario')) {
+					FB.api('/me', function (me) {
+						checkPermissions(function() {
+							var params = {
+								facebook_id	: me.id,
+								first_name	: me.first_name,
+								last_name	: me.last_name,
+								email		: me.email
+							};
+							invocarLogin(params,
+								function (response, textStatus, jqXHR) {
+									setCache('usuario', response);
+									iniciarProceso();
+									app.registerWithFacebook();
+								},
+								function(jqXHR, textStatus, errorThrown) {
+									alert('No pudimos conectarnos con el servidor de Adivina-Me, vuelve a intentarlo mas tarde.');
+									mostrarConectar();
+								});
+						});
+					});
+				} else {
+					checkPermissions(function() {
+						iniciarProceso();
+					});
+				}
+			} else {
+				mostrarConectar();
+			}
+		});
+	});
+
+FB.Event.subscribe(
+	'auth.logout',
+	function(response) {
+		mostrarConectar();
+	});
 
 function checkPermissions(funcionSuccess) {
 	FB.api('/me/permissions',
@@ -235,7 +244,7 @@ function checkPermissions(funcionSuccess) {
 			} else {
 				perms = response.data[0];
 			}
-			if (!(perms && perms.read_stream && perms.publish_stream && perms.email)) {
+			if (!(perms && perms.email)) {
 				error = true;
 			}
 			
@@ -262,16 +271,19 @@ function mostrarConectar() {
 
 function login() {
 	playAudio('click');
+	$('#btn_conectar_fb').hide();
 	FB.login(
 		function (response) {
 			if (response.authResponse) {
 				removeCache('usuario');
 				redirigir(paginaPrincipal);
 			} else {
+				mostrarConectar();
 				alert("Tienes que conectar la aplicación a Facebook para poder continuar.");
 			}
 		},
-		{ scope: "read_stream,publish_stream,email"}
+		// { scope: "email"} // Android
+		{ scope: "email,publish_stream"} // iOS
 	);
 }
 
@@ -338,7 +350,7 @@ function abrirTemplate(template) {
 		url: template,
 		success: function(data) {
 			if (number_template == current_template) {
-				$("#content_load").html(data).hide().fadeIn('slow');
+				$("#content_load").html(data);
 			}
 		}
 	});
@@ -359,8 +371,9 @@ function obtieneCarta(elemento, posicion, onclick, clases) {
 		clases = '';
 	}
                           
-    if (elemento.estatus == 'bloqueado'){
+    if (elemento.estatus == 'bloqueado') {
         imagenCarta = 'img/ju_carta_bloqueada.png';
+        clases += ' cartaBloqueada';
     } else {
         imagenCarta = 'img/ju_carta_logo.png';
     }
@@ -373,6 +386,18 @@ function loaderCartas() {
 	$('.thumb').load(function(event) {
 		$('#' + $(event.target).attr('id_loader')).hide();
 	});
+}
+
+function presionarBoton(elemento) {
+    var source = elemento.attr('src');
+    var arreglo = source.split('.');
+    elemento.attr('src', arreglo[0] + '_over.' + arreglo[1]);
+}
+                          
+function soltarBoton(elemento) {
+    var source = elemento.attr('src');
+    var arreglo = source.split('_over');
+    elemento.attr('src', arreglo[0] + arreglo[1]);
 }
 
 /** Funciones para cache **/
@@ -416,6 +441,8 @@ var funciones;
 var ALERTA_OK = 'OK';
 var ALERTA_SI_NO = 'SI_NO';
 var ALERTA_PREGUNTA = 'PREGUNTA';
+var ALERTA_ADIVINAR_PREGUNTAR = 'ADIVINAR_PREGUNTAR';
+var ALERTA_ADIVINAR = 'ADIVINAR';
 var ALERTA_NUEVO_JUEGO = 'NUEVO_JUEGO';
 var ALERTA_INPUT = 'INPUT';
 
@@ -441,8 +468,9 @@ function alert(texto, tipo, acciones) {
 		$('.alerta[tipo="' + tipo + '"]').children('.alerta_imagen').html(acciones['imagen']);
 	}
 	
-	$('.alerta[tipo="' + tipo + '"]').show();
-	$('#alertas').fadeIn('fast');
+    $('#alertas').fadeIn('fast', function() {
+        $('.alerta[tipo="' + tipo + '"]').show();
+    });
 	
 	// navigator.notification.alert(texto, null, 'AdivinaMe'); // Alert original
 }
@@ -472,16 +500,17 @@ var audio_alerta;
 var audio_click;
 
 function createAudio(name) {
-	var src;
+	var src = ''; // iOS
+	// var src = 'file:///android_asset/www/'; // Android
 	switch(name) {
 		case 'flip':
-			src = 'audio/flip.wav';
+			src += 'audio/flip.wav';
 			break;
 		case 'alert':
-			src = 'audio/alerta.wav';
+			src += 'audio/alerta.wav';
 			break;
 		case 'click':
-			src = 'audio/click.wav';
+			src += 'audio/click.wav';
 			break;
 		default:
 			break;         
@@ -533,7 +562,6 @@ function enviarPostFB(facebook_id, funcionSuccess) {
 		FB.ui({
 			method: 'feed',
 			to: facebook_id,
-			redirect_uri: 'http://apps.facebook.com/Adivina_Me/',
 			link: 'http://apps.facebook.com/Adivina_Me/',
 			picture: 'http://fbrell.com/f8.jpg',
 			name: 'Adivina-Me',

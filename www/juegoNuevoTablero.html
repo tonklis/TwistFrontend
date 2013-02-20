@@ -8,7 +8,9 @@
     var tipoTablero = TIPO_CARTA_AMIGO;
     
     // Obtenemos todos los personajes y famosos con los que se generarán los tableros y los desplegamos
-    getTablero();
+    setTimeout(function() {
+    	getTablero();
+    }, 1000);
         
     function getTablero() {
     	obtenerCartasPorId({ 'id' : TIPO_CARTA_FAMOSO },
@@ -80,17 +82,11 @@
     
     function validarPartida() {
         // Aquí va la lógica que crea la partida en el backend
-        console.log('Probando... Probando...');
         if (posicionSeleccionada != null) {
-        	if (getCache('aj_post')) {
-				enviarPostFB('' + getCache('nuevo_oponente').id, function(response) {
-					$('#loading').show();
-					crearPartida();
-				});
-        	} else {
-        		$('#loading').show();
-        		crearPartida();
-        	}
+			enviarPostFB('' + getCache('nuevo_oponente').id, function(response) {
+				$('#loading').show();
+				crearPartida();
+			});
         } else {
             alert('Debes seleccionar tu carta para continuar.');
         }
