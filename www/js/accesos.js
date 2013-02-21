@@ -23,8 +23,8 @@ var SERVICIO_RESETEAR_BADGES = 13;
  *   insatisfactoria con los parámetros function(jqXHR, textStatus, errorThrown);
  **/
 function invocarServicio(tipo, params, funcionSuccess, funcionError) {
-	//var url = "http://still-eyrie-7957.herokuapp.com/";
-    var url = "http://192.168.1.128:3000/";
+	var url = "http://still-eyrie-7957.herokuapp.com/";
+    //var url = "http://192.168.1.128:3000/";
 	var paramsCompletos = false;
 	switch (tipo) {
 		case SERVICIO_LOGIN:
