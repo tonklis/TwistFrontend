@@ -7,6 +7,13 @@
 	var amigosJugando = 0;
     var posicionSeleccionada = null;
     
+    // Cambio de imágenes para botones.
+	$('#btn_continuar').bind('touchstart',function() { presionarBoton($(this)); });
+    $('#btn_continuar').bind('touchend',function() { soltarBoton($(this)); });
+    
+    $('#btn_salir').bind('touchstart',function() { presionarBoton($(this)); });
+    $('#btn_salir').bind('touchend',function() { soltarBoton($(this)); });
+    
     setTimeout(function() {
     	crearOponentes();
     }, 1000);

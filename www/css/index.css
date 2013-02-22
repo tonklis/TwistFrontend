@@ -239,18 +239,31 @@ body:after {
 }
 
 .alerta .alerta_mensaje {
-	margin-top: 10%;
 	font-size: 120%;
+	
+	margin-left: 5%;
+	margin-right: 5%;
+	
+	padding-top: 15%;
+	
+	max-height: 75%;
+	
+	overflow: auto;
 }
 
 .alerta .alerta_input {
 }
 
 .alerta .alerta_botones {
+	position: absolute;
+	
+	bottom: 5%;
+	
 	width: 90%;
-	margin-top: 5%;
 	margin-left: auto;
 	margin-right: auto;
+	
+	text-align: center;
 }
 
 .alerta .alerta_botones img {
@@ -263,7 +276,7 @@ body:after {
 .alerta .alerta_imagen {
     width : 30%;
     float: left;
-    margin-top: 10%;
+    margin-top: 5%;
     
     background: #FFFFFF;
     
@@ -281,6 +294,10 @@ body:after {
 	bottom: 5%;
 	
 	color: #000000;
+}
+
+.alerta .alerta_monedas {
+	width: 15%;
 }
 
 .carta {

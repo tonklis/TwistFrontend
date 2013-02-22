@@ -7,6 +7,13 @@
     // Obtenemos el tipo de tablero que se debe generar
     var tipoTablero = TIPO_CARTA_AMIGO;
     
+	// Cambio de imágenes para botones.
+    $('#btn_tablero_continuar').bind('touchstart',function() { presionarBoton($(this)); });
+    $('#btn_tablero_continuar').bind('touchend',function() { soltarBoton($(this)); });
+    
+    $('#btn_tablero_salir').bind('touchstart',function() { presionarBoton($(this)); });
+    $('#btn_tablero_salir').bind('touchend',function() { soltarBoton($(this)); });
+    
     // Obtenemos todos los personajes y famosos con los que se generarán los tableros y los desplegamos
     setTimeout(function() {
     	getTablero();
