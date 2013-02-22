@@ -79,7 +79,7 @@ var app = {
     },
     sendNotification: function(game_id, message, sound, badge) {
         var xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("POST","http://"+URL+"/ios_send_notification_to_opponent.json",true);
+        xmlhttp.open("POST","http://"+URL+"/send_notification_to_opponent.json",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         xmlhttp.send("game_id="+game_id+"&message="+message+"&sound="+sound+"&badge="+badge);
         xmlhttp.onreadystatechange=function() {
@@ -137,7 +137,7 @@ var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
 var templateDashboard = "dashboard.html";
 
-//var URL = "192.168.1.128:3000";
+//var URL = "192.168.100.7:3000";
 var URL = "still-eyrie-7957.herokuapp.com";
 
 var appId = "336541486458847";
