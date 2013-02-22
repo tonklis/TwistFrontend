@@ -462,6 +462,45 @@ function alert(texto, tipo, acciones) {
 	$('#alerta_input').val('');
 	
 	$('.alerta[tipo="' + tipo + '"]').children('.alerta_mensaje').html(texto);
+	switch(tipo) {
+		case ALERTA_PREGUNTA:
+			if (texto.length <= 20) {
+				$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '15%');
+			} else if (texto.length <= 40) {
+				$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '10%');
+			} else if (texto.length <= 60) {
+				$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '5%');
+			} else {
+				$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '0%');
+			}
+			$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-left', '5%');
+			$('.alerta[tipo="' + tipo + '"] .alerta_botones').css('bottom', '5%');
+			break;
+		case ALERTA_INPUT:
+			$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '10%');
+			$('.alerta[tipo="' + tipo + '"] .alerta_botones').css('bottom', '15%');
+			break;
+		case ALERTA_NUEVO_JUEGO:
+			$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '0%');
+			$('.alerta[tipo="' + tipo + '"] .alerta_botones').css('bottom', '5%');
+			break;
+		default:
+			if (texto.length <= 35) {
+				$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '15%');
+				$('.alerta[tipo="' + tipo + '"] .alerta_botones').css('bottom', '20%');
+			} else if (texto.length <= 70) {
+				$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '10%');
+				$('.alerta[tipo="' + tipo + '"] .alerta_botones').css('bottom', '15%');
+			} else if (texto.length <= 105) {
+				$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '5%');
+				$('.alerta[tipo="' + tipo + '"] .alerta_botones').css('bottom', '10%');
+			} else {
+				$('.alerta[tipo="' + tipo + '"] .alerta_mensaje').css('padding-top', '0%');
+				$('.alerta[tipo="' + tipo + '"] .alerta_botones').css('bottom', '5%');
+			}
+			break;
+	}
+	
 	funciones = acciones;
 	
 	if (tipo == ALERTA_PREGUNTA && acciones['imagen']) {

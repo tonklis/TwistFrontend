@@ -8,6 +8,12 @@
 	// Cambio de imágenes para botones.
 	$('#btn_nuevo_juego').bind('touchstart',function() { presionarBoton($(this)); });
     $('#btn_nuevo_juego').bind('touchend',function() { soltarBoton($(this)); });
+    
+    actualizaUsuario(
+    	function (response, textStatus, jqXHR) {
+    		usuario = getCache('usuario');
+    		$('#total_monedas').html(usuario.money);
+    	});
 	
 	obtenerJuegosPorUsuario({ id : usuario.id },
 		function(response, textStatus, jqXHR) {
