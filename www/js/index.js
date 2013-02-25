@@ -34,18 +34,12 @@ var app = {
     receiveEvent: function(event) {
         // handle push notifications inside the app
     	if (paginaActual == templateDashboard) {
-    		inicio();
+            app.clearBadgesAndRefresh();
     	}
     },
     onResume: function() {
-    	resetearBadges({ id : getCache('usuario').id },
-    						function(response, textStatus, jqXHR) {
-    							app.setBadges(0);
-    							app.getPending();
-    						},
-                            function(jqXHR, textStatus, errorThrown) {
-                            });
-        inicio();
+        // handle push notifications outside the app
+    	app.clearBadgesAndRefresh();
     },
     getBadges: function() {
         pushNotification.getApplicationIconBadgeNumber(function(badgeNumber) {
@@ -110,6 +104,16 @@ var app = {
             }
         }
     },
+    clearBadgesAndRefresh: function(){
+        resetearBadges({ id : getCache('usuario').id },
+                       function(response, textStatus, jqXHR) {
+                       app.setBadges(0);
+                       app.getPending();
+                       },
+                       function(jqXHR, textStatus, errorThrown) {
+                       });
+        inicio();
+    },
     // deviceready Event Handler
     //
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
@@ -137,7 +141,7 @@ var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
 var templateDashboard = "dashboard.html";
 
-//var URL = "192.168.100.7:3000";
+//var URL = "192.168.1.225:3000";
 var URL = "still-eyrie-7957.herokuapp.com";
 
 var appId = "336541486458847";
