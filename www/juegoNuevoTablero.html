@@ -31,7 +31,7 @@
     		}, funcionError);
     }
     
-    function generarTablero(tipoTablero) {
+    function generarTablero() {
     	$('#loading').show();
     	$('#mnu_carta').removeClass('marco_carta');
         $('#mnu_carta').html('<div id="mnu_carta"><img class="instruccion" src="img/nu_selecciona_persona.png"/></div>');
@@ -69,9 +69,10 @@
         $('#loading').hide();
     }
     
-    function seleccionarTablero(tipoTablero) {
-        generarTablero(tipoTablero);
-        actualizarBotones(tipoTablero);
+    function seleccionarTablero(tipo) {
+    	tipoTablero = tipo;
+        generarTablero();
+        actualizarBotones();
     }
     
     function seleccionarPersonaje(posicion) {
@@ -160,11 +161,11 @@
         $('#loading').hide();
     }
     
-    function actualizarBotones(tipo) {
+    function actualizarBotones() {
     	$('#btn_tablero_personajes').attr('src', 'img/nu_btn_personajes.png');
     	$('#btn_tablero_amigos').attr('src', 'img/nu_btn_amigos.png');
     	$('#btn_tablero_famosos').attr('src', 'img/nu_btn_famosos.png');
-    	switch(tipo) {
+    	switch(tipoTablero) {
     		case TIPO_CARTA_PERSONAJE:
     			$('#btn_tablero_personajes').attr('src', 'img/nu_btn_personajes_over.png');
     			break;

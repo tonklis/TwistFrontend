@@ -200,8 +200,8 @@ FB.Event.subscribe(
 	function(responseS) {
 		FB.getLoginStatus(function (response) {
 			if (response.status == 'connected') {
-				if (!isCache('usuario')) {
-					FB.api('/me', function (me) {
+				FB.api('/me', function (me) {
+					if (!isCache('usuario') || getCache('usuario').facebook_id != me.id) {
 						checkPermissions(function() {
 							var params = {
 								facebook_id	: me.id,
@@ -220,12 +220,12 @@ FB.Event.subscribe(
 									mostrarConectar();
 								});
 						});
-					});
-				} else {
-					checkPermissions(function() {
-						iniciarProceso();
-					});
-				}
+					} else {
+						checkPermissions(function() {
+							iniciarProceso();
+						});
+					}
+				});
 			} else {
 				mostrarConectar();
 			}
