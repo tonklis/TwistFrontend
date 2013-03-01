@@ -24,7 +24,7 @@ var SERVICIO_RESETEAR_BADGES = 13;
  **/
 function invocarServicio(tipo, params, funcionSuccess, funcionError) {
 	var url = "http://still-eyrie-7957.herokuapp.com/";
-    //var url = "http://192.168.1.225:3000/";
+    // var url = "http://192.168.1.128:3000/";
 	var paramsCompletos = false;
 	var getPost = 'post';
 	switch (tipo) {
@@ -154,8 +154,12 @@ function invocarServicio(tipo, params, funcionSuccess, funcionError) {
 		request.fail(function (jqXHR, textStatus, errorThrown) {
 			funcionError(jqXHR, textStatus, errorThrown);
 			if (textStatus == 'timeout') {
-				alert('Al parecer tu conexión a internet es inestable. Por favor vuelve a intentar.');
-				inicio();
+				alert('Al parecer tu conexión a internet es inestable. Por favor vuelve a intentar.',
+					ALERTA_OK,
+					{
+                        'btn_continuar' : function () { inicio(); }
+                  	});
+				$('#loading').hide();
 			}
 		});
 	} else {

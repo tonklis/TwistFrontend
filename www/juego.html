@@ -260,8 +260,8 @@
     }
     
     function seleccionarAccionClick(accion) {
+    	$('.click').unbind('click');
     	if (accion == 'seleccion') {
-    		$('.click').unbind('click');
     		$('.click').click(
     			function() {
                     if (!$(this).hasClass('flip')) {
@@ -270,7 +270,6 @@
                     }
     			});
     	} else if (accion == 'flip') {
-    		$('.click').unbind('click');
     		$('.click').click(
     			function() {
     				playAudio('flip');
@@ -291,8 +290,6 @@
     					$(this).addClass('flip');
     				}
     			});
-    	} else {
-    		$('.click').unbind('click');
     	}
     }
     
@@ -384,7 +381,7 @@
 					inicio();
 				} else {
 					app.sendNotification(juego.id, getCache('usuario').first_name + " ha ganado el juego.", true, 1);
-					alert('<img src="img/monedas.png" class="alerta_monedas" /> ' + response.board.money_awarded + '<br/><br/>¡Ganaste! ¿Deseas crear una nuevo juego?',
+					alert('<img src="img/monedas.png" class="alerta_monedas" /> ' + response.board.money_awarded + '<br/><br/>¡Ganaste! ¿Deseas crear un nuevo juego?',
 						ALERTA_NUEVO_JUEGO,
 						{
 							'btn_nuevo_juego' : function() {
