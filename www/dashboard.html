@@ -27,6 +27,10 @@
 						$div.html(data);
 						agregarJuego($div, response[i]);
 					}
+					$('#cuadro_negro').css({webkitOverflowScrolling: 'auto', overflow: 'hidden'});
+					setTimeout(function () {
+						$('#cuadro_negro').css({webkitOverflowScrolling: 'touch', overflow: 'auto'});
+					},10);
 					setCache('partidas', response);
 					$('#loading').hide();
 				}

@@ -112,6 +112,7 @@ var app = {
                        },
                        function(jqXHR, textStatus, errorThrown) {
                        });
+        cerrarAlert();
         inicio();
     },
     // deviceready Event Handler
