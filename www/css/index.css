@@ -238,6 +238,19 @@ body:after {
 	overflow: auto;
 }
 
+.alerta .alerta_cerrar {
+	position: absolute;
+	
+	top: 0%;
+	right: 0%;
+	
+	text-align: center;
+}
+
+.alerta .alerta_cerrar img {
+	height: 20%;
+}
+
 .alerta .alerta_mensaje {
 	font-size: 120%;
 	
@@ -814,6 +827,64 @@ body:after {
 	-webkit-transform: rotateY(0deg);
 	-moz-transform: rotateY(0deg);
 }
+
+
+/** FLIP IOS 5.X **/
+
+.panel_ios5 {
+	background: transparent !important;
+}
+
+.panel_ios5 .front {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 900;
+	
+	background: #FFFFFF;
+	
+	-moz-border-radius: 5%;
+	border-radius: 5%;
+	
+	
+}
+.panel_ios5.flip .front {
+	z-index: 900;
+	border-color: #eee;
+	background: #333;
+	
+}
+
+.panel_ios5 .back {
+	display: block;
+	position: absolute;
+	
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 800;
+	
+	background: #FF0017;
+	text-shadow: 1px  1px 1px rgba(0,0,0,0.6);
+	
+	-moz-border-radius: 5%;
+	border-radius: 5%;
+	
+}
+
+.panel_ios5.flip .back {
+	z-index: 1000;
+	background: #FF0017;
+	
+}
+
+.panel_ios5.cartaBloqueada .back {
+	background: #262626 !important;
+}
+
 
 /** ADAPTACIONES **/
 /** Original (480 de ancho) **/

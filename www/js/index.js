@@ -33,8 +33,10 @@ var app = {
     },
     receiveEvent: function(event) {
         // handle push notifications inside the app
+        app.clearBadgesAndRefresh();
     	if (paginaActual == templateDashboard) {
-            app.clearBadgesAndRefresh();
+			cerrarAlert();
+            inicio();
     	}
     },
     onResume: function() {
@@ -112,8 +114,6 @@ var app = {
                        },
                        function(jqXHR, textStatus, errorThrown) {
                        });
-        cerrarAlert();
-        inicio();
     },
     // deviceready Event Handler
     //

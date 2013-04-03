@@ -67,6 +67,7 @@
         for (var i = 0; i < 20; i++) {
         	cuadro_negro += obtieneCarta(tablero[i], i, 'seleccionarPersonaje(' + i + ')');
         }
+        $('#cuadro_negro').css({webkitOverflowScrolling: 'auto', overflow: 'hidden'});
         $('#cuadro_negro').html(cuadro_negro);
         loaderCartas();
         $('#loading').hide();
