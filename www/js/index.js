@@ -142,7 +142,7 @@ var paginaPrincipal = "default.html";
 var paginaSinConexion = "sinConexion.html";
 var templateDashboard = "dashboard.html";
 
-//var URL = "192.168.1.225:3000";
+//var URL = "192.168.2.13:3000";
 var URL = "still-eyrie-7957.herokuapp.com";
 
 var appId = "336541486458847";
@@ -236,7 +236,7 @@ FB.Event.subscribe(
 FB.Event.subscribe(
 	'auth.logout',
 	function(response) {
-		mostrarConectar();
+		//mostrarConectar();
 	});
 
 function checkPermissions(funcionSuccess) {

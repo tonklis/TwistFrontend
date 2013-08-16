@@ -66,5 +66,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>Plugins</key>
+	<dict>
+		<key>PushNotification</key>
+		<string>PushNotification</string>
+	</dict>
 </dict>
 </plist>
